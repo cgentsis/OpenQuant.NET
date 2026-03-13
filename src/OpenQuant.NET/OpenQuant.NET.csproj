@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net9.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RootNamespace>OpenQuant</RootNamespace>
+    <PackageId>OpenQuant.NET</PackageId>
+    <Version>0.1.0</Version>
+    <Authors>Christos Gentsis</Authors>
+    <Description>An open-source .NET library providing unified financial data access, quantitative analysis tools, and extensible market-data integrations.</Description>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/cgentsis/OpenQuant.NET</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/cgentsis/OpenQuant.NET</RepositoryUrl>
+    <PackageTags>finance;quant;market-data;stocks;trading;analysis</PackageTags>
+  </PropertyGroup>
+
+</Project>
