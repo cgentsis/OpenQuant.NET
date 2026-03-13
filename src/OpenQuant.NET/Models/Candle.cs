@@ -1,11 +1,10 @@
 namespace OpenQuant.Models;
 
 /// <summary>
-/// Represents a single price quote for a financial instrument.
+/// Represents a single OHLCV price candle for a financial instrument.
 /// </summary>
-public sealed record Quote
+public sealed record Candle
 {
-    public required string Symbol { get; init; }
     public required DateTimeOffset Timestamp { get; init; }
     public required decimal Open { get; init; }
     public required decimal High { get; init; }

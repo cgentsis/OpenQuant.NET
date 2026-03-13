@@ -3,7 +3,7 @@ using OpenQuant.Models;
 namespace OpenQuant;
 
 /// <summary>
-/// Defines the contract for a market data provider that retrieves financial quotes.
+/// Defines the contract for a market data provider that retrieves financial candles.
 /// </summary>
 public interface IMarketDataProvider
 {
@@ -13,18 +13,18 @@ public interface IMarketDataProvider
     string Name { get; }
 
     /// <summary>
-    /// Retrieves historical quotes for the given symbol within the specified date range.
+    /// Retrieves historical candles for the given symbol within the specified date range.
     /// </summary>
-    Task<IReadOnlyList<Quote>> GetHistoricalQuotesAsync(
+    Task<IReadOnlyList<Candle>> GetHistoricalCandlesAsync(
         string symbol,
         DateTimeOffset from,
         DateTimeOffset to,
         CancellationToken cancellationToken = default);
 
     /// <summary>
-    /// Retrieves the latest quote for the given symbol.
+    /// Retrieves the latest candle for the given symbol.
     /// </summary>
-    Task<Quote?> GetLatestQuoteAsync(
+    Task<Candle?> GetLatestCandleAsync(
         string symbol,
         CancellationToken cancellationToken = default);
 }

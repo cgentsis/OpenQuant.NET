@@ -1,3 +1,4 @@
+using System.Threading.Tasks.Dataflow;
 using OpenQuant.Analysis;
 using OpenQuant.Models;
 
@@ -5,51 +6,62 @@ namespace OpenQuant.Tests.Analysis;
 
 public class MovingAverageTests
 {
-    private static Quote MakeQuote(decimal close, int dayOffset = 0) => new()
-    {
-        Symbol = "TEST",
-        Timestamp = new DateTimeOffset(2025, 1, 1, 0, 0, 0, TimeSpan.Zero).AddDays(dayOffset),
-        Open = close,
-        High = close,
-        Low = close,
-        Close = close,
-        Volume = 1000
-    };
-
     [Fact]
-    public void Simple_WithValidPeriod_ReturnsCorrectAverages()
+    public async Task Simple_WithValidPeriod_ReturnsCorrectAverages()
     {
-        var quotes = new[]
+        var output = new BufferBlock<(DateTimeOffset Timestamp, decimal Value)>();
+        var block = MovingAverage.SMAActionBlockFactory(3, output);
+
+        await block.SendAsync(MakeCandle(10m, 0));
+        await block.SendAsync(MakeCandle(20m, 1));
+        await block.SendAsync(MakeCandle(30m, 2));
+        await block.SendAsync(MakeCandle(40m, 3));
+        await block.SendAsync(MakeCandle(50m, 4));
+        block.Complete();
+        await block.Completion;
+
+        var results = new List<(DateTimeOffset Timestamp, decimal Value)>();
+        while (output.TryReceive(out var item))
         {
-            MakeQuote(10m, 0),
-            MakeQuote(20m, 1),
-            MakeQuote(30m, 2),
-            MakeQuote(40m, 3),
-            MakeQuote(50m, 4),
-        };
+            results.Add(item);
+        }
 
-        var result = MovingAverage.Simple(quotes, 3);
-
-        Assert.Equal(3, result.Count);
-        Assert.Equal(20m, result[0].Value);  // (10+20+30)/3
-        Assert.Equal(30m, result[1].Value);  // (20+30+40)/3
-        Assert.Equal(40m, result[2].Value);  // (30+40+50)/3
+        Assert.Equal(3, results.Count);
+        Assert.Equal(20m, results[0].Value);  // (10+20+30)/3
+        Assert.Equal(30m, results[1].Value);  // (20+30+40)/3
+        Assert.Equal(40m, results[2].Value);  // (30+40+50)/3
     }
 
     [Fact]
-    public void Simple_WithPeriodLargerThanData_ReturnsEmpty()
+    public async Task Simple_WithPeriodLargerThanData_ProducesNoOutput()
     {
-        var quotes = new[] { MakeQuote(10m), MakeQuote(20m) };
+        var output = new BufferBlock<(DateTimeOffset Timestamp, decimal Value)>();
+        var block = MovingAverage.SMAActionBlockFactory(5, output);
 
-        var result = MovingAverage.Simple(quotes, 5);
+        await block.SendAsync(MakeCandle(10m));
+        await block.SendAsync(MakeCandle(20m));
+        block.Complete();
+        await block.Completion;
 
-        Assert.Empty(result);
+        Assert.False(output.TryReceive(out _));
     }
 
     [Fact]
     public void Simple_WithPeriodLessThanOne_Throws()
     {
+        var output = new BufferBlock<(DateTimeOffset Timestamp, decimal Value)>();
+
         Assert.Throws<ArgumentOutOfRangeException>(() =>
-            MovingAverage.Simple([], 0));
+            MovingAverage.SMAActionBlockFactory(0, output));
     }
+
+    private static Candle MakeCandle(decimal close, int dayOffset = 0) => new()
+    {
+        Timestamp = new DateTimeOffset(2025, 1, 1, 0, 0, 0, TimeSpan.Zero).AddDays(dayOffset),
+        Open = close,
+        High = close,
+        Low = close,
+        Close = close,
+        Volume = 1000,
+    };
 }

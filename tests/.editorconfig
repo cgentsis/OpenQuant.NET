@@ -1,0 +1,4 @@
+[*.cs]
+# Test methods and classes are self-documenting by naming convention
+dotnet_diagnostic.SA1600.severity = none
+dotnet_diagnostic.SA1601.severity = none

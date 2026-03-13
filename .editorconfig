@@ -1,0 +1,43 @@
+root = true
+
+[*]
+indent_style = space
+indent_size = 4
+end_of_line = crlf
+charset = utf-8
+trim_trailing_whitespace = true
+insert_final_newline = true
+
+[*.cs]
+# SA0001: XML comment analysis disabled
+dotnet_diagnostic.SA0001.severity = none
+# SA1000: 'new' keyword spacing (false positive with target-typed new)
+dotnet_diagnostic.SA1000.severity = none
+# SA1009: Closing parenthesis spacing (false positive with primary constructors)
+dotnet_diagnostic.SA1009.severity = none
+# SA1010: Opening square brackets (false positive with collection expressions)
+dotnet_diagnostic.SA1010.severity = none
+# SA1101: Prefix local calls with this
+dotnet_diagnostic.SA1101.severity = none
+# SA1206: required modifier ordering (not supported by StyleCop 1.x)
+dotnet_diagnostic.SA1206.severity = none
+# SA1309: Field should not begin with underscore
+dotnet_diagnostic.SA1309.severity = none
+# SA1633: File header
+dotnet_diagnostic.SA1633.severity = none
+
+# Member ordering: SA1201 (element order) and SA1202 (access modifier order) are enforced.
+# Expected order within a class/struct:
+#   1. Constants
+#   2. Static readonly fields
+#   3. Fields
+#   4. Constructors
+#   5. Properties
+#   6. Public methods
+#   7. Internal methods
+#   8. Protected methods
+#   9. Private methods
+#  10. Nested types
+# Within each group: public > internal > protected > private
+dotnet_diagnostic.SA1201.severity = error
+dotnet_diagnostic.SA1202.severity = error
