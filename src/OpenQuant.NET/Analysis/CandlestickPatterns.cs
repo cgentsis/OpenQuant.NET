@@ -1345,4 +1345,1028 @@ public static class CandlestickPatterns
                 MaxDegreeOfParallelism = 1,
             });
     }
+
+    /// <summary>Detects a Two Crows pattern (3-bar bearish reversal).</summary>
+    /// <param name="name">The key under which the value is stored in <see cref="EnrichedCandle.Indicators"/>.</param>
+    /// <param name="cancellationToken">Optional cancellation token.</param>
+    /// <returns>A transform block to use as a pipeline stage.</returns>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> TwoCrows(
+        string name,
+        CancellationToken cancellationToken = default)
+    {
+        Candle? prev2 = null;
+        Candle? prev1 = null;
+
+        return new TransformBlock<EnrichedCandle, EnrichedCandle>(
+            enriched =>
+            {
+                var c = enriched.Candle;
+
+                if (prev2 != null && prev1 != null)
+                {
+                    var firstBody = Math.Abs(prev2.Close - prev2.Open);
+                    var firstRange = prev2.High - prev2.Low;
+
+                    if (firstRange > 0m && firstBody >= (firstRange * 0.5m) &&
+                        prev2.Close > prev2.Open && prev1.Close < prev1.Open && c.Close < c.Open &&
+                        prev1.Open > prev2.High &&
+                        c.Open < prev1.Open && c.Open > prev1.Close &&
+                        c.Close < prev2.Close && c.Close > prev2.Open)
+                    {
+                        enriched.Indicators[name] = -100m;
+                    }
+                }
+
+                prev2 = prev1;
+                prev1 = c;
+                return enriched;
+            },
+            new ExecutionDataflowBlockOptions
+            {
+                CancellationToken = cancellationToken,
+                MaxDegreeOfParallelism = 1,
+            });
+    }
+
+    /// <summary>Detects a Three Inside pattern (Harami with confirmation).</summary>
+    /// <param name="name">The key under which the value is stored in <see cref="EnrichedCandle.Indicators"/>.</param>
+    /// <param name="cancellationToken">Optional cancellation token.</param>
+    /// <returns>A transform block to use as a pipeline stage.</returns>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> ThreeInside(
+        string name,
+        CancellationToken cancellationToken = default)
+    {
+        Candle? prev2 = null;
+        Candle? prev1 = null;
+
+        return new TransformBlock<EnrichedCandle, EnrichedCandle>(
+            enriched =>
+            {
+                var c = enriched.Candle;
+
+                if (prev2 != null && prev1 != null)
+                {
+                    var firstBody = Math.Abs(prev2.Close - prev2.Open);
+                    var secondBody = Math.Abs(prev1.Close - prev1.Open);
+                    var firstBodyHigh = Math.Max(prev2.Open, prev2.Close);
+                    var firstBodyLow = Math.Min(prev2.Open, prev2.Close);
+                    var secondBodyHigh = Math.Max(prev1.Open, prev1.Close);
+                    var secondBodyLow = Math.Min(prev1.Open, prev1.Close);
+                    var insideBody = secondBodyHigh <= firstBodyHigh && secondBodyLow >= firstBodyLow && secondBody < firstBody;
+
+                    if (insideBody)
+                    {
+                        if (prev2.Close < prev2.Open && prev1.Close > prev1.Open && c.Close > c.Open && c.Close > prev2.Open)
+                        {
+                            enriched.Indicators[name] = 100m;
+                        }
+                        else if (prev2.Close > prev2.Open && prev1.Close < prev1.Open && c.Close < c.Open && c.Close < prev2.Open)
+                        {
+                            enriched.Indicators[name] = -100m;
+                        }
+                    }
+                }
+
+                prev2 = prev1;
+                prev1 = c;
+                return enriched;
+            },
+            new ExecutionDataflowBlockOptions
+            {
+                CancellationToken = cancellationToken,
+                MaxDegreeOfParallelism = 1,
+            });
+    }
+
+    /// <summary>Detects a Three Line Strike pattern (4-bar continuation).</summary>
+    /// <param name="name">The key under which the value is stored in <see cref="EnrichedCandle.Indicators"/>.</param>
+    /// <param name="cancellationToken">Optional cancellation token.</param>
+    /// <returns>A transform block to use as a pipeline stage.</returns>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> ThreeLineStrike(
+        string name,
+        CancellationToken cancellationToken = default)
+    {
+        Candle? prev3 = null;
+        Candle? prev2 = null;
+        Candle? prev1 = null;
+
+        return new TransformBlock<EnrichedCandle, EnrichedCandle>(
+            enriched =>
+            {
+                var c = enriched.Candle;
+
+                if (prev3 != null && prev2 != null && prev1 != null)
+                {
+                    if (prev3.Close > prev3.Open && prev2.Close > prev2.Open && prev1.Close > prev1.Open &&
+                        prev2.Close > prev3.Close && prev1.Close > prev2.Close &&
+                        prev2.Open > prev3.Open && prev1.Open > prev2.Open &&
+                        c.Close < c.Open && c.Open > prev1.Close && c.Close < prev3.Open)
+                    {
+                        enriched.Indicators[name] = 100m;
+                    }
+                    else if (prev3.Close < prev3.Open && prev2.Close < prev2.Open && prev1.Close < prev1.Open &&
+                        prev2.Close < prev3.Close && prev1.Close < prev2.Close &&
+                        prev2.Open < prev3.Open && prev1.Open < prev2.Open &&
+                        c.Close > c.Open && c.Open < prev1.Close && c.Close > prev3.Open)
+                    {
+                        enriched.Indicators[name] = -100m;
+                    }
+                }
+
+                prev3 = prev2;
+                prev2 = prev1;
+                prev1 = c;
+                return enriched;
+            },
+            new ExecutionDataflowBlockOptions
+            {
+                CancellationToken = cancellationToken,
+                MaxDegreeOfParallelism = 1,
+            });
+    }
+
+    /// <summary>Detects a Three Stars In South pattern (3-bar bullish exhaustion).</summary>
+    /// <param name="name">The key under which the value is stored in <see cref="EnrichedCandle.Indicators"/>.</param>
+    /// <param name="cancellationToken">Optional cancellation token.</param>
+    /// <returns>A transform block to use as a pipeline stage.</returns>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> ThreeStarsInSouth(
+        string name,
+        CancellationToken cancellationToken = default)
+    {
+        Candle? prev2 = null;
+        Candle? prev1 = null;
+
+        return new TransformBlock<EnrichedCandle, EnrichedCandle>(
+            enriched =>
+            {
+                var c = enriched.Candle;
+
+                if (prev2 != null && prev1 != null)
+                {
+                    var body2 = Math.Abs(prev2.Close - prev2.Open);
+                    var body1 = Math.Abs(prev1.Close - prev1.Open);
+                    var body0 = Math.Abs(c.Close - c.Open);
+                    var upper2 = prev2.High - Math.Max(prev2.Open, prev2.Close);
+                    var upper1 = prev1.High - Math.Max(prev1.Open, prev1.Close);
+                    var upper0 = c.High - Math.Max(c.Open, c.Close);
+                    var lower2 = Math.Min(prev2.Open, prev2.Close) - prev2.Low;
+                    var lower1 = Math.Min(prev1.Open, prev1.Close) - prev1.Low;
+                    var lower0 = Math.Min(c.Open, c.Close) - c.Low;
+
+                    if (prev2.Close < prev2.Open && prev1.Close < prev1.Open && c.Close < c.Open &&
+                        prev1.Close < prev2.Close && c.Close < prev1.Close &&
+                        body1 < body2 && body0 < body1 &&
+                        lower2 > lower1 && lower1 >= lower0 &&
+                        upper2 >= upper1 && upper1 >= upper0)
+                    {
+                        enriched.Indicators[name] = 100m;
+                    }
+                }
+
+                prev2 = prev1;
+                prev1 = c;
+                return enriched;
+            },
+            new ExecutionDataflowBlockOptions
+            {
+                CancellationToken = cancellationToken,
+                MaxDegreeOfParallelism = 1,
+            });
+    }
+
+    /// <summary>Detects an Abandoned Baby pattern (3-bar reversal with gaps around a Doji).</summary>
+    /// <param name="name">The key under which the value is stored in <see cref="EnrichedCandle.Indicators"/>.</param>
+    /// <param name="cancellationToken">Optional cancellation token.</param>
+    /// <returns>A transform block to use as a pipeline stage.</returns>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> AbandonedBaby(
+        string name,
+        CancellationToken cancellationToken = default)
+    {
+        Candle? prev2 = null;
+        Candle? prev1 = null;
+
+        return new TransformBlock<EnrichedCandle, EnrichedCandle>(
+            enriched =>
+            {
+                var c = enriched.Candle;
+
+                if (prev2 != null && prev1 != null)
+                {
+                    var firstBody = Math.Abs(prev2.Close - prev2.Open);
+                    var firstRange = prev2.High - prev2.Low;
+                    var dojiBody = Math.Abs(prev1.Close - prev1.Open);
+                    var dojiRange = prev1.High - prev1.Low;
+                    var isDoji = dojiRange > 0m && dojiBody <= (dojiRange * 0.05m);
+
+                    if (firstRange > 0m && firstBody >= (firstRange * 0.5m) && isDoji)
+                    {
+                        if (prev2.Close < prev2.Open && prev1.High < prev2.Low && c.Close > c.Open && c.Low > prev1.High)
+                        {
+                            enriched.Indicators[name] = 100m;
+                        }
+                        else if (prev2.Close > prev2.Open && prev1.Low > prev2.High && c.Close < c.Open && c.High < prev1.Low)
+                        {
+                            enriched.Indicators[name] = -100m;
+                        }
+                    }
+                }
+
+                prev2 = prev1;
+                prev1 = c;
+                return enriched;
+            },
+            new ExecutionDataflowBlockOptions
+            {
+                CancellationToken = cancellationToken,
+                MaxDegreeOfParallelism = 1,
+            });
+    }
+
+    /// <summary>Detects an Advance Block pattern (3 bullish candles with weakening momentum).</summary>
+    /// <param name="name">The key under which the value is stored in <see cref="EnrichedCandle.Indicators"/>.</param>
+    /// <param name="cancellationToken">Optional cancellation token.</param>
+    /// <returns>A transform block to use as a pipeline stage.</returns>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> AdvanceBlock(
+        string name,
+        CancellationToken cancellationToken = default)
+    {
+        Candle? prev2 = null;
+        Candle? prev1 = null;
+
+        return new TransformBlock<EnrichedCandle, EnrichedCandle>(
+            enriched =>
+            {
+                var c = enriched.Candle;
+
+                if (prev2 != null && prev1 != null)
+                {
+                    var body2 = Math.Abs(prev2.Close - prev2.Open);
+                    var body1 = Math.Abs(prev1.Close - prev1.Open);
+                    var body0 = Math.Abs(c.Close - c.Open);
+                    var upper2 = prev2.High - Math.Max(prev2.Open, prev2.Close);
+                    var upper1 = prev1.High - Math.Max(prev1.Open, prev1.Close);
+                    var upper0 = c.High - Math.Max(c.Open, c.Close);
+
+                    if (prev2.Close > prev2.Open && prev1.Close > prev1.Open && c.Close > c.Open &&
+                        prev1.Close > prev2.Close && c.Close > prev1.Close &&
+                        body2 > body1 && body1 > body0 &&
+                        upper2 < upper1 && upper1 < upper0)
+                    {
+                        enriched.Indicators[name] = -100m;
+                    }
+                }
+
+                prev2 = prev1;
+                prev1 = c;
+                return enriched;
+            },
+            new ExecutionDataflowBlockOptions
+            {
+                CancellationToken = cancellationToken,
+                MaxDegreeOfParallelism = 1,
+            });
+    }
+
+    /// <summary>Detects a Breakaway pattern (5-bar reversal).</summary>
+    /// <param name="name">The key under which the value is stored in <see cref="EnrichedCandle.Indicators"/>.</param>
+    /// <param name="cancellationToken">Optional cancellation token.</param>
+    /// <returns>A transform block to use as a pipeline stage.</returns>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> Breakaway(
+        string name,
+        CancellationToken cancellationToken = default)
+    {
+        Candle? prev4 = null;
+        Candle? prev3 = null;
+        Candle? prev2 = null;
+        Candle? prev1 = null;
+
+        return new TransformBlock<EnrichedCandle, EnrichedCandle>(
+            enriched =>
+            {
+                var c = enriched.Candle;
+
+                if (prev4 != null && prev3 != null && prev2 != null && prev1 != null)
+                {
+                    var firstBody = Math.Abs(prev4.Close - prev4.Open);
+                    var firstRange = prev4.High - prev4.Low;
+                    var thirdBody = Math.Abs(prev2.Close - prev2.Open);
+                    var thirdRange = prev2.High - prev2.Low;
+                    var fourthBody = Math.Abs(prev1.Close - prev1.Open);
+                    var fourthRange = prev1.High - prev1.Low;
+                    var finalBody = Math.Abs(c.Close - c.Open);
+                    var finalRange = c.High - c.Low;
+                    var thirdSmall = thirdRange > 0m && thirdBody <= (thirdRange * 0.4m);
+                    var fourthSmall = fourthRange > 0m && fourthBody <= (fourthRange * 0.4m);
+
+                    if (firstRange > 0m && finalRange > 0m && firstBody >= (firstRange * 0.5m) && finalBody >= (finalRange * 0.5m) && thirdSmall && fourthSmall)
+                    {
+                        if (prev4.Close < prev4.Open && prev3.Close < prev3.Open && prev3.High < prev4.Low &&
+                            prev2.High < prev4.Low && prev1.High < prev4.Low &&
+                            c.Close > c.Open && c.Close > prev3.High && c.Close < prev4.Low)
+                        {
+                            enriched.Indicators[name] = 100m;
+                        }
+                        else if (prev4.Close > prev4.Open && prev3.Close > prev3.Open && prev3.Low > prev4.High &&
+                            prev2.Low > prev4.High && prev1.Low > prev4.High &&
+                            c.Close < c.Open && c.Close < prev3.Low && c.Close > prev4.High)
+                        {
+                            enriched.Indicators[name] = -100m;
+                        }
+                    }
+                }
+
+                prev4 = prev3;
+                prev3 = prev2;
+                prev2 = prev1;
+                prev1 = c;
+                return enriched;
+            },
+            new ExecutionDataflowBlockOptions
+            {
+                CancellationToken = cancellationToken,
+                MaxDegreeOfParallelism = 1,
+            });
+    }
+
+    /// <summary>Detects a Concealing Baby Swallow pattern (4-bar bullish reversal).</summary>
+    /// <param name="name">The key under which the value is stored in <see cref="EnrichedCandle.Indicators"/>.</param>
+    /// <param name="cancellationToken">Optional cancellation token.</param>
+    /// <returns>A transform block to use as a pipeline stage.</returns>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> ConcealingBabySwallow(
+        string name,
+        CancellationToken cancellationToken = default)
+    {
+        Candle? prev3 = null;
+        Candle? prev2 = null;
+        Candle? prev1 = null;
+
+        return new TransformBlock<EnrichedCandle, EnrichedCandle>(
+            enriched =>
+            {
+                var c = enriched.Candle;
+
+                if (prev3 != null && prev2 != null && prev1 != null)
+                {
+                    var firstBody = Math.Abs(prev3.Close - prev3.Open);
+                    var firstRange = prev3.High - prev3.Low;
+                    var secondBody = Math.Abs(prev2.Close - prev2.Open);
+                    var secondRange = prev2.High - prev2.Low;
+                    var firstMarubozu = firstRange > 0m && firstBody >= (firstRange * 0.95m) && prev3.Close < prev3.Open;
+                    var secondMarubozu = secondRange > 0m && secondBody >= (secondRange * 0.95m) && prev2.Close < prev2.Open;
+
+                    if (firstMarubozu && secondMarubozu && prev1.Close < prev1.Open && c.Close < c.Open &&
+                        prev1.Open < prev2.Close && prev1.High > prev2.Close && prev1.High < prev2.Open &&
+                        c.High >= prev1.High && c.Low <= prev1.Low)
+                    {
+                        enriched.Indicators[name] = 100m;
+                    }
+                }
+
+                prev3 = prev2;
+                prev2 = prev1;
+                prev1 = c;
+                return enriched;
+            },
+            new ExecutionDataflowBlockOptions
+            {
+                CancellationToken = cancellationToken,
+                MaxDegreeOfParallelism = 1,
+            });
+    }
+
+    /// <summary>Detects a Gap Side-Side White pattern (3-bar gap continuation).</summary>
+    /// <param name="name">The key under which the value is stored in <see cref="EnrichedCandle.Indicators"/>.</param>
+    /// <param name="cancellationToken">Optional cancellation token.</param>
+    /// <returns>A transform block to use as a pipeline stage.</returns>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> GapSideSideWhite(
+        string name,
+        CancellationToken cancellationToken = default)
+    {
+        Candle? prev2 = null;
+        Candle? prev1 = null;
+
+        return new TransformBlock<EnrichedCandle, EnrichedCandle>(
+            enriched =>
+            {
+                var c = enriched.Candle;
+
+                if (prev2 != null && prev1 != null)
+                {
+                    var secondBody = Math.Abs(prev1.Close - prev1.Open);
+                    var thirdBody = Math.Abs(c.Close - c.Open);
+                    var secondRange = prev1.High - prev1.Low;
+                    var similarBody = Math.Abs(thirdBody - secondBody) <= (Math.Max(thirdBody, secondBody) * 0.1m);
+                    var similarOpen = secondRange > 0m && Math.Abs(c.Open - prev1.Open) <= (secondRange * 0.1m);
+
+                    if (similarBody && similarOpen)
+                    {
+                        if (prev1.Close > prev1.Open && c.Close > c.Open && prev1.Low > prev2.High && c.Low > prev2.High)
+                        {
+                            enriched.Indicators[name] = 100m;
+                        }
+                        else if (prev1.Close < prev1.Open && c.Close < c.Open && prev1.High < prev2.Low && c.High < prev2.Low)
+                        {
+                            enriched.Indicators[name] = -100m;
+                        }
+                    }
+                }
+
+                prev2 = prev1;
+                prev1 = c;
+                return enriched;
+            },
+            new ExecutionDataflowBlockOptions
+            {
+                CancellationToken = cancellationToken,
+                MaxDegreeOfParallelism = 1,
+            });
+    }
+
+    /// <summary>Detects a Hikkake pattern (inside bar followed by a breakout).</summary>
+    /// <param name="name">The key under which the value is stored in <see cref="EnrichedCandle.Indicators"/>.</param>
+    /// <param name="cancellationToken">Optional cancellation token.</param>
+    /// <returns>A transform block to use as a pipeline stage.</returns>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> Hikkake(
+        string name,
+        CancellationToken cancellationToken = default)
+    {
+        Candle? prev2 = null;
+        Candle? prev1 = null;
+
+        return new TransformBlock<EnrichedCandle, EnrichedCandle>(
+            enriched =>
+            {
+                var c = enriched.Candle;
+
+                if (prev2 != null && prev1 != null && prev1.High < prev2.High && prev1.Low > prev2.Low)
+                {
+                    if (c.Close > prev2.High)
+                    {
+                        enriched.Indicators[name] = 100m;
+                    }
+                    else if (c.Close < prev2.Low)
+                    {
+                        enriched.Indicators[name] = -100m;
+                    }
+                }
+
+                prev2 = prev1;
+                prev1 = c;
+                return enriched;
+            },
+            new ExecutionDataflowBlockOptions
+            {
+                CancellationToken = cancellationToken,
+                MaxDegreeOfParallelism = 1,
+            });
+    }
+
+    /// <summary>Detects a Modified Hikkake pattern (inside bar plus Harami before breakout).</summary>
+    /// <param name="name">The key under which the value is stored in <see cref="EnrichedCandle.Indicators"/>.</param>
+    /// <param name="cancellationToken">Optional cancellation token.</param>
+    /// <returns>A transform block to use as a pipeline stage.</returns>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> HikkakeMod(
+        string name,
+        CancellationToken cancellationToken = default)
+    {
+        Candle? prev2 = null;
+        Candle? prev1 = null;
+
+        return new TransformBlock<EnrichedCandle, EnrichedCandle>(
+            enriched =>
+            {
+                var c = enriched.Candle;
+
+                if (prev2 != null && prev1 != null)
+                {
+                    var firstBodyHigh = Math.Max(prev2.Open, prev2.Close);
+                    var firstBodyLow = Math.Min(prev2.Open, prev2.Close);
+                    var secondBodyHigh = Math.Max(prev1.Open, prev1.Close);
+                    var secondBodyLow = Math.Min(prev1.Open, prev1.Close);
+                    var insideRange = prev1.High < prev2.High && prev1.Low > prev2.Low;
+                    var insideBody = secondBodyHigh <= firstBodyHigh && secondBodyLow >= firstBodyLow;
+
+                    if (insideRange && insideBody)
+                    {
+                        if (c.Close > prev2.High)
+                        {
+                            enriched.Indicators[name] = 100m;
+                        }
+                        else if (c.Close < prev2.Low)
+                        {
+                            enriched.Indicators[name] = -100m;
+                        }
+                    }
+                }
+
+                prev2 = prev1;
+                prev1 = c;
+                return enriched;
+            },
+            new ExecutionDataflowBlockOptions
+            {
+                CancellationToken = cancellationToken,
+                MaxDegreeOfParallelism = 1,
+            });
+    }
+
+    /// <summary>Detects Identical Three Crows (3 bearish candles opening near the prior close).</summary>
+    /// <param name="name">The key under which the value is stored in <see cref="EnrichedCandle.Indicators"/>.</param>
+    /// <param name="cancellationToken">Optional cancellation token.</param>
+    /// <returns>A transform block to use as a pipeline stage.</returns>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> IdenticalThreeCrows(
+        string name,
+        CancellationToken cancellationToken = default)
+    {
+        Candle? prev2 = null;
+        Candle? prev1 = null;
+
+        return new TransformBlock<EnrichedCandle, EnrichedCandle>(
+            enriched =>
+            {
+                var c = enriched.Candle;
+
+                if (prev2 != null && prev1 != null && prev2.Close < prev2.Open && prev1.Close < prev1.Open && c.Close < c.Open)
+                {
+                    var tolerance1 = Math.Max(Math.Abs(prev2.Close) * 0.01m, (prev2.High - prev2.Low) * 0.01m);
+                    var tolerance2 = Math.Max(Math.Abs(prev1.Close) * 0.01m, (prev1.High - prev1.Low) * 0.01m);
+
+                    if (Math.Abs(prev1.Open - prev2.Close) <= tolerance1 && Math.Abs(c.Open - prev1.Close) <= tolerance2 &&
+                        prev1.Close < prev2.Close && c.Close < prev1.Close)
+                    {
+                        enriched.Indicators[name] = -100m;
+                    }
+                }
+
+                prev2 = prev1;
+                prev1 = c;
+                return enriched;
+            },
+            new ExecutionDataflowBlockOptions
+            {
+                CancellationToken = cancellationToken,
+                MaxDegreeOfParallelism = 1,
+            });
+    }
+
+    /// <summary>Detects a Kicking By Length pattern (direction follows the longer Marubozu).</summary>
+    /// <param name="name">The key under which the value is stored in <see cref="EnrichedCandle.Indicators"/>.</param>
+    /// <param name="cancellationToken">Optional cancellation token.</param>
+    /// <returns>A transform block to use as a pipeline stage.</returns>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> KickingByLength(
+        string name,
+        CancellationToken cancellationToken = default)
+    {
+        Candle? prev = null;
+
+        return new TransformBlock<EnrichedCandle, EnrichedCandle>(
+            enriched =>
+            {
+                var c = enriched.Candle;
+
+                if (prev != null)
+                {
+                    var prevBody = Math.Abs(prev.Close - prev.Open);
+                    var prevRange = prev.High - prev.Low;
+                    var curBody = Math.Abs(c.Close - c.Open);
+                    var curRange = c.High - c.Low;
+                    var prevMarubozu = prevRange > 0m && prevBody >= (prevRange * 0.95m);
+                    var curMarubozu = curRange > 0m && curBody >= (curRange * 0.95m);
+
+                    if (prevMarubozu && curMarubozu)
+                    {
+                        if (prev.Close < prev.Open && c.Close > c.Open && c.Low > prev.High)
+                        {
+                            enriched.Indicators[name] = curBody >= prevBody ? 100m : -100m;
+                        }
+                        else if (prev.Close > prev.Open && c.Close < c.Open && c.High < prev.Low)
+                        {
+                            enriched.Indicators[name] = curBody >= prevBody ? -100m : 100m;
+                        }
+                    }
+                }
+
+                prev = c;
+                return enriched;
+            },
+            new ExecutionDataflowBlockOptions
+            {
+                CancellationToken = cancellationToken,
+                MaxDegreeOfParallelism = 1,
+            });
+    }
+
+    /// <summary>Detects a Ladder Bottom pattern (5-bar bullish reversal).</summary>
+    /// <param name="name">The key under which the value is stored in <see cref="EnrichedCandle.Indicators"/>.</param>
+    /// <param name="cancellationToken">Optional cancellation token.</param>
+    /// <returns>A transform block to use as a pipeline stage.</returns>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> LadderBottom(
+        string name,
+        CancellationToken cancellationToken = default)
+    {
+        Candle? prev4 = null;
+        Candle? prev3 = null;
+        Candle? prev2 = null;
+        Candle? prev1 = null;
+
+        return new TransformBlock<EnrichedCandle, EnrichedCandle>(
+            enriched =>
+            {
+                var c = enriched.Candle;
+
+                if (prev4 != null && prev3 != null && prev2 != null && prev1 != null)
+                {
+                    var fourthUpper = prev1.High - Math.Max(prev1.Open, prev1.Close);
+                    var fourthRange = prev1.High - prev1.Low;
+                    var fourthBodyHigh = Math.Max(prev1.Open, prev1.Close);
+
+                    if (prev4.Close < prev4.Open && prev3.Close < prev3.Open && prev2.Close < prev2.Open && prev1.Close < prev1.Open &&
+                        prev3.Close < prev4.Close && prev2.Close < prev3.Close && prev1.Close < prev2.Close &&
+                        fourthRange > 0m && fourthUpper >= (fourthRange * 0.2m) &&
+                        c.Close > c.Open && c.Open > fourthBodyHigh && c.Close > prev1.High)
+                    {
+                        enriched.Indicators[name] = 100m;
+                    }
+                }
+
+                prev4 = prev3;
+                prev3 = prev2;
+                prev2 = prev1;
+                prev1 = c;
+                return enriched;
+            },
+            new ExecutionDataflowBlockOptions
+            {
+                CancellationToken = cancellationToken,
+                MaxDegreeOfParallelism = 1,
+            });
+    }
+
+    /// <summary>Detects a Mat Hold pattern (5-bar bullish continuation).</summary>
+    /// <param name="name">The key under which the value is stored in <see cref="EnrichedCandle.Indicators"/>.</param>
+    /// <param name="cancellationToken">Optional cancellation token.</param>
+    /// <returns>A transform block to use as a pipeline stage.</returns>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> MatHold(
+        string name,
+        CancellationToken cancellationToken = default)
+    {
+        Candle? prev4 = null;
+        Candle? prev3 = null;
+        Candle? prev2 = null;
+        Candle? prev1 = null;
+
+        return new TransformBlock<EnrichedCandle, EnrichedCandle>(
+            enriched =>
+            {
+                var c = enriched.Candle;
+
+                if (prev4 != null && prev3 != null && prev2 != null && prev1 != null)
+                {
+                    var firstBody = Math.Abs(prev4.Close - prev4.Open);
+                    var firstRange = prev4.High - prev4.Low;
+                    var secondBody = Math.Abs(prev3.Close - prev3.Open);
+                    var secondRange = prev3.High - prev3.Low;
+                    var thirdBody = Math.Abs(prev2.Close - prev2.Open);
+                    var thirdRange = prev2.High - prev2.Low;
+                    var fourthBody = Math.Abs(prev1.Close - prev1.Open);
+                    var fourthRange = prev1.High - prev1.Low;
+                    var finalBody = Math.Abs(c.Close - c.Open);
+                    var finalRange = c.High - c.Low;
+                    var midpoint = (prev4.Open + prev4.Close) / 2m;
+                    var smallPullback = secondRange > 0m && secondBody <= (secondRange * 0.5m) &&
+                        thirdRange > 0m && thirdBody <= (thirdRange * 0.5m) &&
+                        fourthRange > 0m && fourthBody <= (fourthRange * 0.5m);
+                    var bearishCount = (prev3.Close < prev3.Open ? 1 : 0) + (prev2.Close < prev2.Open ? 1 : 0) + (prev1.Close < prev1.Open ? 1 : 0);
+                    var maxHigh = Math.Max(Math.Max(prev4.High, prev3.High), Math.Max(prev2.High, prev1.High));
+
+                    if (firstRange > 0m && finalRange > 0m && firstBody >= (firstRange * 0.5m) && finalBody >= (finalRange * 0.5m) &&
+                        prev4.Close > prev4.Open && prev3.Low > prev4.High &&
+                        prev3.Low > midpoint && prev2.Low > midpoint && prev1.Low > midpoint &&
+                        smallPullback && bearishCount >= 2 &&
+                        c.Close > c.Open && c.Close > maxHigh)
+                    {
+                        enriched.Indicators[name] = 100m;
+                    }
+                }
+
+                prev4 = prev3;
+                prev3 = prev2;
+                prev2 = prev1;
+                prev1 = c;
+                return enriched;
+            },
+            new ExecutionDataflowBlockOptions
+            {
+                CancellationToken = cancellationToken,
+                MaxDegreeOfParallelism = 1,
+            });
+    }
+
+    /// <summary>Detects Rising/Falling Three Methods (5-bar continuation).</summary>
+    /// <param name="name">The key under which the value is stored in <see cref="EnrichedCandle.Indicators"/>.</param>
+    /// <param name="cancellationToken">Optional cancellation token.</param>
+    /// <returns>A transform block to use as a pipeline stage.</returns>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> RisingFallingThreeMethods(
+        string name,
+        CancellationToken cancellationToken = default)
+    {
+        Candle? prev4 = null;
+        Candle? prev3 = null;
+        Candle? prev2 = null;
+        Candle? prev1 = null;
+
+        return new TransformBlock<EnrichedCandle, EnrichedCandle>(
+            enriched =>
+            {
+                var c = enriched.Candle;
+
+                if (prev4 != null && prev3 != null && prev2 != null && prev1 != null)
+                {
+                    var firstBody = Math.Abs(prev4.Close - prev4.Open);
+                    var firstRange = prev4.High - prev4.Low;
+                    var secondBody = Math.Abs(prev3.Close - prev3.Open);
+                    var thirdBody = Math.Abs(prev2.Close - prev2.Open);
+                    var fourthBody = Math.Abs(prev1.Close - prev1.Open);
+                    var finalBody = Math.Abs(c.Close - c.Open);
+                    var finalRange = c.High - c.Low;
+                    var smallBodies = secondBody < firstBody && thirdBody < firstBody && fourthBody < firstBody;
+                    var insideFirstRange = prev3.High <= prev4.High && prev3.Low >= prev4.Low &&
+                        prev2.High <= prev4.High && prev2.Low >= prev4.Low &&
+                        prev1.High <= prev4.High && prev1.Low >= prev4.Low;
+
+                    if (firstRange > 0m && finalRange > 0m && firstBody >= (firstRange * 0.5m) && finalBody >= (finalRange * 0.5m) && smallBodies && insideFirstRange)
+                    {
+                        if (prev4.Close > prev4.Open && prev3.Close < prev3.Open && prev2.Close < prev2.Open && prev1.Close < prev1.Open &&
+                            c.Close > c.Open && c.Close > prev4.High)
+                        {
+                            enriched.Indicators[name] = 100m;
+                        }
+                        else if (prev4.Close < prev4.Open && prev3.Close > prev3.Open && prev2.Close > prev2.Open && prev1.Close > prev1.Open &&
+                            c.Close < c.Open && c.Close < prev4.Low)
+                        {
+                            enriched.Indicators[name] = -100m;
+                        }
+                    }
+                }
+
+                prev4 = prev3;
+                prev3 = prev2;
+                prev2 = prev1;
+                prev1 = c;
+                return enriched;
+            },
+            new ExecutionDataflowBlockOptions
+            {
+                CancellationToken = cancellationToken,
+                MaxDegreeOfParallelism = 1,
+            });
+    }
+
+    /// <summary>Detects a Stalled Pattern (3-bar bearish exhaustion after rising candles).</summary>
+    /// <param name="name">The key under which the value is stored in <see cref="EnrichedCandle.Indicators"/>.</param>
+    /// <param name="cancellationToken">Optional cancellation token.</param>
+    /// <returns>A transform block to use as a pipeline stage.</returns>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> StalledPattern(
+        string name,
+        CancellationToken cancellationToken = default)
+    {
+        Candle? prev2 = null;
+        Candle? prev1 = null;
+
+        return new TransformBlock<EnrichedCandle, EnrichedCandle>(
+            enriched =>
+            {
+                var c = enriched.Candle;
+
+                if (prev2 != null && prev1 != null)
+                {
+                    var prev1Body = Math.Abs(prev1.Close - prev1.Open);
+                    var currentBody = Math.Abs(c.Close - c.Open);
+                    var currentRange = c.High - c.Low;
+                    var currentUpper = c.High - Math.Max(c.Open, c.Close);
+                    var openTolerance = (prev1.High - prev1.Low) * 0.1m;
+
+                    if (prev2.Close > prev2.Open && prev1.Close > prev1.Open && c.Close > c.Open &&
+                        prev1.Close > prev2.Close && c.Close > prev1.Close &&
+                        currentRange > 0m && currentBody < prev1Body && currentUpper <= (currentRange * 0.1m) &&
+                        c.Open >= prev1.Open - openTolerance && c.Open <= prev1.Close + openTolerance)
+                    {
+                        enriched.Indicators[name] = -100m;
+                    }
+                }
+
+                prev2 = prev1;
+                prev1 = c;
+                return enriched;
+            },
+            new ExecutionDataflowBlockOptions
+            {
+                CancellationToken = cancellationToken,
+                MaxDegreeOfParallelism = 1,
+            });
+    }
+
+    /// <summary>Detects a Takuri pattern (Doji-like candle with a very long lower shadow).</summary>
+    /// <param name="name">The key under which the value is stored in <see cref="EnrichedCandle.Indicators"/>.</param>
+    /// <param name="cancellationToken">Optional cancellation token.</param>
+    /// <returns>A transform block to use as a pipeline stage.</returns>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> Takuri(
+        string name,
+        CancellationToken cancellationToken = default)
+    {
+        return new TransformBlock<EnrichedCandle, EnrichedCandle>(
+            enriched =>
+            {
+                var c = enriched.Candle;
+                var body = Math.Abs(c.Close - c.Open);
+                var range = c.High - c.Low;
+                var upperShadow = c.High - Math.Max(c.Open, c.Close);
+                var lowerShadow = Math.Min(c.Open, c.Close) - c.Low;
+
+                if (range > 0m && body <= (range * 0.05m) && upperShadow <= (range * 0.05m) && lowerShadow >= ((range - lowerShadow) * 3m))
+                {
+                    enriched.Indicators[name] = 100m;
+                }
+
+                return enriched;
+            },
+            new ExecutionDataflowBlockOptions
+            {
+                CancellationToken = cancellationToken,
+                MaxDegreeOfParallelism = 1,
+            });
+    }
+
+    /// <summary>Detects a Tasuki Gap pattern (3-bar continuation after a gap).</summary>
+    /// <param name="name">The key under which the value is stored in <see cref="EnrichedCandle.Indicators"/>.</param>
+    /// <param name="cancellationToken">Optional cancellation token.</param>
+    /// <returns>A transform block to use as a pipeline stage.</returns>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> TasukiGap(
+        string name,
+        CancellationToken cancellationToken = default)
+    {
+        Candle? prev2 = null;
+        Candle? prev1 = null;
+
+        return new TransformBlock<EnrichedCandle, EnrichedCandle>(
+            enriched =>
+            {
+                var c = enriched.Candle;
+
+                if (prev2 != null && prev1 != null)
+                {
+                    if (prev2.Close > prev2.Open && prev1.Close > prev1.Open && prev1.Low > prev2.High &&
+                        c.Close < c.Open && c.Open > prev1.Open && c.Open < prev1.Close &&
+                        c.Close < prev1.Low && c.Close > prev2.High)
+                    {
+                        enriched.Indicators[name] = 100m;
+                    }
+                    else if (prev2.Close < prev2.Open && prev1.Close < prev1.Open && prev1.High < prev2.Low &&
+                        c.Close > c.Open && c.Open < prev1.Open && c.Open > prev1.Close &&
+                        c.Close > prev1.High && c.Close < prev2.Low)
+                    {
+                        enriched.Indicators[name] = -100m;
+                    }
+                }
+
+                prev2 = prev1;
+                prev1 = c;
+                return enriched;
+            },
+            new ExecutionDataflowBlockOptions
+            {
+                CancellationToken = cancellationToken,
+                MaxDegreeOfParallelism = 1,
+            });
+    }
+
+    /// <summary>Detects a Unique 3 River pattern (3-bar bullish reversal).</summary>
+    /// <param name="name">The key under which the value is stored in <see cref="EnrichedCandle.Indicators"/>.</param>
+    /// <param name="cancellationToken">Optional cancellation token.</param>
+    /// <returns>A transform block to use as a pipeline stage.</returns>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> Unique3River(
+        string name,
+        CancellationToken cancellationToken = default)
+    {
+        Candle? prev2 = null;
+        Candle? prev1 = null;
+
+        return new TransformBlock<EnrichedCandle, EnrichedCandle>(
+            enriched =>
+            {
+                var c = enriched.Candle;
+
+                if (prev2 != null && prev1 != null)
+                {
+                    var firstBody = Math.Abs(prev2.Close - prev2.Open);
+                    var firstRange = prev2.High - prev2.Low;
+                    var secondBodyHigh = Math.Max(prev1.Open, prev1.Close);
+                    var secondBodyLow = Math.Min(prev1.Open, prev1.Close);
+                    var firstBodyHigh = Math.Max(prev2.Open, prev2.Close);
+                    var firstBodyLow = Math.Min(prev2.Open, prev2.Close);
+                    var currentBody = Math.Abs(c.Close - c.Open);
+                    var currentRange = c.High - c.Low;
+
+                    if (firstRange > 0m && firstBody >= (firstRange * 0.5m) &&
+                        prev2.Close < prev2.Open && prev1.Close < prev1.Open &&
+                        secondBodyHigh <= firstBodyHigh && secondBodyLow >= firstBodyLow && prev1.Low < prev2.Low &&
+                        currentRange > 0m && currentBody <= (currentRange * 0.4m) && c.Close > c.Open && c.Close < prev1.Close)
+                    {
+                        enriched.Indicators[name] = 100m;
+                    }
+                }
+
+                prev2 = prev1;
+                prev1 = c;
+                return enriched;
+            },
+            new ExecutionDataflowBlockOptions
+            {
+                CancellationToken = cancellationToken,
+                MaxDegreeOfParallelism = 1,
+            });
+    }
+
+    /// <summary>Detects an Upside Gap Two Crows pattern (3-bar bearish reversal).</summary>
+    /// <param name="name">The key under which the value is stored in <see cref="EnrichedCandle.Indicators"/>.</param>
+    /// <param name="cancellationToken">Optional cancellation token.</param>
+    /// <returns>A transform block to use as a pipeline stage.</returns>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> UpsideGap2Crows(
+        string name,
+        CancellationToken cancellationToken = default)
+    {
+        Candle? prev2 = null;
+        Candle? prev1 = null;
+
+        return new TransformBlock<EnrichedCandle, EnrichedCandle>(
+            enriched =>
+            {
+                var c = enriched.Candle;
+
+                if (prev2 != null && prev1 != null)
+                {
+                    var firstBody = Math.Abs(prev2.Close - prev2.Open);
+                    var firstRange = prev2.High - prev2.Low;
+
+                    if (firstRange > 0m && firstBody >= (firstRange * 0.5m) &&
+                        prev2.Close > prev2.Open && prev1.Close < prev1.Open && c.Close < c.Open &&
+                        prev1.Open > prev2.Close && c.Open > prev1.Open && c.Close < prev1.Close && c.Close > prev2.Close)
+                    {
+                        enriched.Indicators[name] = -100m;
+                    }
+                }
+
+                prev2 = prev1;
+                prev1 = c;
+                return enriched;
+            },
+            new ExecutionDataflowBlockOptions
+            {
+                CancellationToken = cancellationToken,
+                MaxDegreeOfParallelism = 1,
+            });
+    }
+
+    /// <summary>Detects an Upside/Downside Gap Three Methods pattern (3-bar continuation).</summary>
+    /// <param name="name">The key under which the value is stored in <see cref="EnrichedCandle.Indicators"/>.</param>
+    /// <param name="cancellationToken">Optional cancellation token.</param>
+    /// <returns>A transform block to use as a pipeline stage.</returns>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> XSideGap3Methods(
+        string name,
+        CancellationToken cancellationToken = default)
+    {
+        Candle? prev2 = null;
+        Candle? prev1 = null;
+
+        return new TransformBlock<EnrichedCandle, EnrichedCandle>(
+            enriched =>
+            {
+                var c = enriched.Candle;
+
+                if (prev2 != null && prev1 != null)
+                {
+                    if (prev2.Close > prev2.Open && prev1.Close > prev1.Open && prev1.Low > prev2.High &&
+                        c.Close < c.Open && c.Open > prev1.Open && c.Open < prev1.Close &&
+                        c.Close > prev2.Open && c.Close < prev2.Close)
+                    {
+                        enriched.Indicators[name] = 100m;
+                    }
+                    else if (prev2.Close < prev2.Open && prev1.Close < prev1.Open && prev1.High < prev2.Low &&
+                        c.Close > c.Open && c.Open < prev1.Open && c.Open > prev1.Close &&
+                        c.Close < prev2.Open && c.Close > prev2.Close)
+                    {
+                        enriched.Indicators[name] = -100m;
+                    }
+                }
+
+                prev2 = prev1;
+                prev1 = c;
+                return enriched;
+            },
+            new ExecutionDataflowBlockOptions
+            {
+                CancellationToken = cancellationToken,
+                MaxDegreeOfParallelism = 1,
+            });
+    }
 }

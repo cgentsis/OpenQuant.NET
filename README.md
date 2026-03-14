@@ -384,7 +384,7 @@ Both are configured in `Directory.Build.props` with `TreatWarningsAsErrors=true`
 
 ### `CandlestickPatterns`
 
-30+ pattern recognizers including: `Doji`, `DragonflyDoji`, `GravestoneDoji`, `Hammer`, `InvertedHammer`, `HangingMan`, `ShootingStar`, `Marubozu`, `ClosingMarubozu`, `SpinningTop`, `Engulfing`, `Harami`, `HaramiCross`, `Piercing`, `DarkCloudCover`, `MorningStar`, `EveningStar`, `MorningDojiStar`, `EveningDojiStar`, `ThreeWhiteSoldiers`, `ThreeBlackCrows`, `LongLine`, `ShortLine`, `DojiStar`, `BeltHold`, `Kicking`, `MatchingLow`, `HomingPigeon`, `Counterattack`, `RickshawMan`, `HighWave`, `Tristar`, `StickSandwich`, `Thrusting`, `InNeck`, `OnNeck`, `SeparatingLines`.
+59 pattern recognizers including: `Doji`, `DragonflyDoji`, `GravestoneDoji`, `LongLeggedDoji`, `Hammer`, `InvertedHammer`, `HangingMan`, `ShootingStar`, `Marubozu`, `ClosingMarubozu`, `SpinningTop`, `Engulfing`, `Harami`, `HaramiCross`, `Piercing`, `DarkCloudCover`, `MorningStar`, `EveningStar`, `MorningDojiStar`, `EveningDojiStar`, `ThreeWhiteSoldiers`, `ThreeBlackCrows`, `LongLine`, `ShortLine`, `DojiStar`, `BeltHold`, `Kicking`, `MatchingLow`, `HomingPigeon`, `Counterattack`, `RickshawMan`, `HighWave`, `Tristar`, `StickSandwich`, `Thrusting`, `InNeck`, `OnNeck`, `SeparatingLines`, `TwoCrows`, `ThreeInside`, `ThreeLineStrike`, `ThreeStarsInSouth`, `AbandonedBaby`, `AdvanceBlock`, `Breakaway`, `ConcealingBabySwallow`, `GapSideSideWhite`, `Hikkake`, `HikkakeMod`, `IdenticalThreeCrows`, `KickingByLength`, `LadderBottom`, `MatHold`, `RisingFallingThreeMethods`, `StalledPattern`, `Takuri`, `TasukiGap`, `Unique3River`, `UpsideGap2Crows`, `XSideGap3Methods`.
 
 ### `YahooFinanceProvider`
 
