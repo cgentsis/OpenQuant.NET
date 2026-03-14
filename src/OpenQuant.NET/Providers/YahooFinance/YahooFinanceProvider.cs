@@ -27,10 +27,22 @@ public sealed class YahooFinanceProvider : IMarketDataProvider
         _baseUri = baseUri ?? DefaultBaseUri;
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Gets the display name of this data provider. Always returns <c>"Yahoo Finance"</c>.
+    /// </summary>
     public string Name => "Yahoo Finance";
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Retrieves historical daily candles for the given symbol from Yahoo Finance
+    /// within the specified date range using the v8 chart API.
+    /// </summary>
+    /// <param name="symbol">The ticker symbol (e.g. <c>"AAPL"</c>).</param>
+    /// <param name="from">Start of the date range (inclusive).</param>
+    /// <param name="to">End of the date range (inclusive).</param>
+    /// <param name="cancellationToken">Optional cancellation token.</param>
+    /// <returns>A read-only list of <see cref="Candle"/> objects ordered by timestamp.</returns>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="symbol"/> is null or whitespace.</exception>
+    /// <exception cref="HttpRequestException">Thrown when the API returns an error or null response.</exception>
     public async Task<IReadOnlyList<Candle>> GetHistoricalCandlesAsync(
         string symbol,
         DateTimeOffset from,
@@ -49,7 +61,15 @@ public sealed class YahooFinanceProvider : IMarketDataProvider
         return ParseCandles(response);
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Retrieves the most recent daily candle for the given symbol from Yahoo Finance
+    /// using the v8 chart API with a <c>1d</c> range.
+    /// </summary>
+    /// <param name="symbol">The ticker symbol (e.g. <c>"MSFT"</c>).</param>
+    /// <param name="cancellationToken">Optional cancellation token.</param>
+    /// <returns>The latest <see cref="Candle"/>, or <see langword="null"/> if no data is available.</returns>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="symbol"/> is null or whitespace.</exception>
+    /// <exception cref="HttpRequestException">Thrown when the API returns an error or null response.</exception>
     public async Task<Candle?> GetLatestCandleAsync(
         string symbol,
         CancellationToken cancellationToken = default)

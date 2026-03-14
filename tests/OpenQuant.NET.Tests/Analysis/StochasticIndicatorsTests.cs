@@ -9,103 +9,121 @@ public class StochasticIndicatorsTests
     private static readonly DateTimeOffset BaseTime = new(2025, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
     [Fact]
-    public async Task Stoch_ProducesBothKeysAfterWarmup()
+    public async Task Stoch_WithValidPeriods_ReturnsExpectedValues()
     {
         var results = new List<EnrichedCandle>();
-        var block = StochasticIndicators.Stoch("STOCH", 3, 2, 2);
+        var stoch = StochasticIndicators.Stoch("Stoch", 3, 1, 1);
         var sink = CreateSink(results);
-        block.LinkTo(sink, new DataflowLinkOptions { PropagateCompletion = true });
+        stoch.LinkTo(sink, new DataflowLinkOptions { PropagateCompletion = true });
 
-        await SendCloses(block, [10m, 12m, 13m, 14m, 15m]);
-        block.Complete();
+        var candles = CreateStochasticCandles();
+
+        foreach (var candle in candles)
+        {
+            await stoch.SendAsync(candle);
+        }
+
+        stoch.Complete();
         await sink.Completion;
 
-        Assert.False(results[2].Indicators.ContainsKey("STOCH_K"));
-        Assert.False(results[3].Indicators.ContainsKey("STOCH_D"));
-        Assert.True(results[4].Indicators.ContainsKey("STOCH_K"));
-        Assert.True(results[4].Indicators.ContainsKey("STOCH_D"));
+        Assert.False(results[0].Indicators.ContainsKey("Stoch_K"));
+        Assert.False(results[1].Indicators.ContainsKey("Stoch_K"));
+        Assert.Equal(87.5m, Math.Round(results[2].Indicators["Stoch_K"], 2));
+        Assert.Equal(87.5m, Math.Round(results[2].Indicators["Stoch_D"], 2));
+        Assert.Equal(42.86m, Math.Round(results[3].Indicators["Stoch_K"], 2));
+        Assert.Equal(42.86m, Math.Round(results[3].Indicators["Stoch_D"], 2));
     }
 
     [Fact]
-    public async Task StochF_ProducesBothKeysAfterWarmup()
+    public async Task StochF_WithValidPeriods_ReturnsExpectedValues()
     {
         var results = new List<EnrichedCandle>();
-        var block = StochasticIndicators.StochF("STOCHF", 3, 2);
+        var stochF = StochasticIndicators.StochF("StochF", 3, 1);
         var sink = CreateSink(results);
-        block.LinkTo(sink, new DataflowLinkOptions { PropagateCompletion = true });
+        stochF.LinkTo(sink, new DataflowLinkOptions { PropagateCompletion = true });
 
-        await SendCloses(block, [10m, 12m, 13m, 14m]);
-        block.Complete();
+        var candles = CreateStochasticCandles();
+
+        foreach (var candle in candles)
+        {
+            await stochF.SendAsync(candle);
+        }
+
+        stochF.Complete();
         await sink.Completion;
 
-        Assert.False(results[1].Indicators.ContainsKey("STOCHF_K"));
-        Assert.False(results[2].Indicators.ContainsKey("STOCHF_D"));
-        Assert.True(results[3].Indicators.ContainsKey("STOCHF_K"));
-        Assert.True(results[3].Indicators.ContainsKey("STOCHF_D"));
+        Assert.False(results[0].Indicators.ContainsKey("StochF_K"));
+        Assert.False(results[1].Indicators.ContainsKey("StochF_K"));
+        Assert.Equal(87.5m, Math.Round(results[2].Indicators["StochF_K"], 2));
+        Assert.Equal(87.5m, Math.Round(results[2].Indicators["StochF_D"], 2));
+        Assert.Equal(42.86m, Math.Round(results[3].Indicators["StochF_K"], 2));
+        Assert.Equal(42.86m, Math.Round(results[3].Indicators["StochF_D"], 2));
     }
 
     [Fact]
-    public async Task StochRsi_ProducesBothKeysAfterWarmup()
+    public async Task StochRsi_WithValidPeriods_ReturnsBoundedValues()
     {
         var results = new List<EnrichedCandle>();
-        var block = StochasticIndicators.StochRsi("STOCHRSI", 5, 5, 2, 2);
+        var stochRsi = StochasticIndicators.StochRsi("StochRsi", 3, 3, 1, 1);
         var sink = CreateSink(results);
-        block.LinkTo(sink, new DataflowLinkOptions { PropagateCompletion = true });
+        stochRsi.LinkTo(sink, new DataflowLinkOptions { PropagateCompletion = true });
 
-        await SendCloses(block, [10m, 12m, 11m, 13m, 12m, 14m, 11m, 15m, 13m, 16m, 14m, 17m, 15m, 18m, 16m, 19m, 17m, 20m, 18m, 21m, 19m, 22m]);
-        block.Complete();
+        var candles = new[]
+        {
+            MakeCandle(44m, 44m, 44m, 44m, dayOffset: 0),
+            MakeCandle(44.34m, 44.34m, 44.34m, 44.34m, dayOffset: 1),
+            MakeCandle(44.09m, 44.09m, 44.09m, 44.09m, dayOffset: 2),
+            MakeCandle(43.61m, 43.61m, 43.61m, 43.61m, dayOffset: 3),
+            MakeCandle(44.33m, 44.33m, 44.33m, 44.33m, dayOffset: 4),
+            MakeCandle(44.83m, 44.83m, 44.83m, 44.83m, dayOffset: 5),
+            MakeCandle(45.10m, 45.10m, 45.10m, 45.10m, dayOffset: 6),
+            MakeCandle(44.02m, 44.02m, 44.02m, 44.02m, dayOffset: 7),
+            MakeCandle(44.17m, 44.17m, 44.17m, 44.17m, dayOffset: 8),
+            MakeCandle(43.56m, 43.56m, 43.56m, 43.56m, dayOffset: 9),
+        };
+
+        foreach (var candle in candles)
+        {
+            await stochRsi.SendAsync(candle);
+        }
+
+        stochRsi.Complete();
         await sink.Completion;
 
-        Assert.False(results[9].Indicators.ContainsKey("STOCHRSI_K"));
-        Assert.False(results[10].Indicators.ContainsKey("STOCHRSI_D"));
-        Assert.True(results[21].Indicators.ContainsKey("STOCHRSI_K"));
-        Assert.True(results[21].Indicators.ContainsKey("STOCHRSI_D"));
-        Assert.InRange(results[21].Indicators["STOCHRSI_K"], 0m, 100m);
-        Assert.InRange(results[21].Indicators["STOCHRSI_D"], 0m, 100m);
+        Assert.False(results[0].Indicators.ContainsKey("StochRsi_K"));
+        Assert.False(results[1].Indicators.ContainsKey("StochRsi_K"));
+        Assert.False(results[2].Indicators.ContainsKey("StochRsi_K"));
+        Assert.False(results[3].Indicators.ContainsKey("StochRsi_K"));
+        Assert.False(results[4].Indicators.ContainsKey("StochRsi_K"));
+        Assert.Equal(100m, Math.Round(results[5].Indicators["StochRsi_K"], 2));
+        Assert.Equal(100m, Math.Round(results[5].Indicators["StochRsi_D"], 2));
+        Assert.Equal(14.49m, Math.Round(results[8].Indicators["StochRsi_K"], 2));
+
+        for (var i = 5; i < results.Count; i++)
+        {
+            Assert.True(results[i].Indicators.ContainsKey("StochRsi_K"));
+            Assert.InRange(results[i].Indicators["StochRsi_K"], 0m, 100m);
+        }
     }
 
     [Fact]
-    public async Task Stoch_KAndDValues_AreBetweenZeroAndHundred()
+    public void Stoch_WithFastKPeriodLessThanOne_Throws()
     {
-        var results = new List<EnrichedCandle>();
-        var block = StochasticIndicators.Stoch("STOCH", 3, 2, 2);
-        var sink = CreateSink(results);
-        block.LinkTo(sink, new DataflowLinkOptions { PropagateCompletion = true });
-
-        await SendCloses(block, [10m, 12m, 13m, 14m, 15m]);
-        block.Complete();
-        await sink.Completion;
-
-        Assert.InRange(results[4].Indicators["STOCH_K"], 0m, 100m);
-        Assert.InRange(results[4].Indicators["STOCH_D"], 0m, 100m);
-    }
-
-    [Fact]
-    public async Task StochF_KValue_IsBetweenZeroAndHundred()
-    {
-        var results = new List<EnrichedCandle>();
-        var block = StochasticIndicators.StochF("STOCHF", 3, 2);
-        var sink = CreateSink(results);
-        block.LinkTo(sink, new DataflowLinkOptions { PropagateCompletion = true });
-
-        await SendCloses(block, [10m, 12m, 13m, 14m]);
-        block.Complete();
-        await sink.Completion;
-
-        Assert.InRange(results[3].Indicators["STOCHF_K"], 0m, 100m);
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            StochasticIndicators.Stoch("Stoch", 0, 1, 1));
     }
 
     private static ActionBlock<EnrichedCandle> CreateSink(List<EnrichedCandle> results) =>
         new(item => results.Add(item));
 
-    private static async Task SendCloses(TransformBlock<EnrichedCandle, EnrichedCandle> block, decimal[] closes)
-    {
-        for (var i = 0; i < closes.Length; i++)
-        {
-            var close = closes[i];
-            await block.SendAsync(MakeCandle(close - 0.5m, close + 1m, close - 1m, close, dayOffset: i));
-        }
-    }
+    private static EnrichedCandle[] CreateStochasticCandles() =>
+    [
+        MakeCandle(10m, 12m, 8m, 10m, dayOffset: 0),
+        MakeCandle(13m, 14m, 9m, 13m, dayOffset: 1),
+        MakeCandle(15m, 16m, 11m, 15m, dayOffset: 2),
+        MakeCandle(12m, 15m, 10m, 12m, dayOffset: 3),
+        MakeCandle(17m, 18m, 13m, 17m, dayOffset: 4),
+    ];
 
     private static EnrichedCandle MakeCandle(
         decimal open,
@@ -113,14 +131,13 @@ public class StochasticIndicatorsTests
         decimal low,
         decimal close,
         long volume = 1000,
-        int dayOffset = 0) =>
-        new(new Candle
-        {
-            Timestamp = BaseTime.AddDays(dayOffset),
-            Open = open,
-            High = high,
-            Low = low,
-            Close = close,
-            Volume = volume,
-        });
+        int dayOffset = 0) => new(new Candle
+    {
+        Timestamp = BaseTime.AddDays(dayOffset),
+        Open = open,
+        High = high,
+        Low = low,
+        Close = close,
+        Volume = volume,
+    });
 }

@@ -9,159 +9,221 @@ public class AdvancedMovingAverageTests
     private static readonly DateTimeOffset BaseTime = new(2025, 1, 1, 0, 0, 0, TimeSpan.Zero);
 
     [Fact]
-    public async Task DEMA_ProducesValueAfterWarmupAndMatchesConstantValue()
+    public async Task DEMA_WithValidPeriod_ReturnsExpectedValues()
     {
-        const int period = 3;
         var results = new List<EnrichedCandle>();
-        var block = MovingAverage.DEMA("DEMA", period);
+        var dema = MovingAverage.DEMA("DEMA", 3);
         var sink = CreateSink(results);
-        block.LinkTo(sink, new DataflowLinkOptions { PropagateCompletion = true });
+        dema.LinkTo(sink, new DataflowLinkOptions { PropagateCompletion = true });
 
-        for (var i = 0; i < 10; i++)
+        var candles = new[]
         {
-            await block.SendAsync(MakeCandle(100m, 101m, 99m, 100m, dayOffset: i));
+            Enrich(10m, 0),
+            Enrich(20m, 1),
+            Enrich(30m, 2),
+            Enrich(40m, 3),
+            Enrich(50m, 4),
+            Enrich(60m, 5),
+            Enrich(70m, 6),
+            Enrich(80m, 7),
+        };
+
+        foreach (var candle in candles)
+        {
+            await dema.SendAsync(candle);
         }
 
-        block.Complete();
+        dema.Complete();
         await sink.Completion;
 
-        for (var i = 0; i < 4; i++)
-        {
-            Assert.False(results[i].Indicators.ContainsKey("DEMA"));
-        }
-
-        Assert.True(results[4].Indicators.ContainsKey("DEMA"));
-        Assert.Equal(100m, results[4].Indicators["DEMA"]);
-        Assert.Equal(100m, results[results.Count - 1].Indicators["DEMA"]);
+        Assert.Equal(8, results.Count);
+        Assert.False(results[0].Indicators.ContainsKey("DEMA"));
+        Assert.False(results[1].Indicators.ContainsKey("DEMA"));
+        Assert.False(results[2].Indicators.ContainsKey("DEMA"));
+        Assert.False(results[3].Indicators.ContainsKey("DEMA"));
+        Assert.Equal(50m, Math.Round(results[4].Indicators["DEMA"], 2));
+        Assert.Equal(70m, Math.Round(results[6].Indicators["DEMA"], 2));
+        Assert.Equal(80m, Math.Round(results[7].Indicators["DEMA"], 2));
     }
 
     [Fact]
-    public async Task TEMA_ProducesValueAfterWarmupAndMatchesConstantValue()
+    public async Task TEMA_WithValidPeriod_ReturnsExpectedValues()
     {
-        const int period = 3;
         var results = new List<EnrichedCandle>();
-        var block = MovingAverage.TEMA("TEMA", period);
+        var tema = MovingAverage.TEMA("TEMA", 2);
         var sink = CreateSink(results);
-        block.LinkTo(sink, new DataflowLinkOptions { PropagateCompletion = true });
+        tema.LinkTo(sink, new DataflowLinkOptions { PropagateCompletion = true });
 
-        for (var i = 0; i < 10; i++)
+        var candles = new[]
         {
-            await block.SendAsync(MakeCandle(100m, 101m, 99m, 100m, dayOffset: i));
+            Enrich(10m, 0),
+            Enrich(20m, 1),
+            Enrich(30m, 2),
+            Enrich(40m, 3),
+            Enrich(50m, 4),
+            Enrich(60m, 5),
+        };
+
+        foreach (var candle in candles)
+        {
+            await tema.SendAsync(candle);
         }
 
-        block.Complete();
+        tema.Complete();
         await sink.Completion;
 
-        for (var i = 0; i < 6; i++)
-        {
-            Assert.False(results[i].Indicators.ContainsKey("TEMA"));
-        }
-
-        Assert.True(results[6].Indicators.ContainsKey("TEMA"));
-        Assert.Equal(100m, results[6].Indicators["TEMA"]);
-        Assert.Equal(100m, results[results.Count - 1].Indicators["TEMA"]);
+        Assert.False(results[0].Indicators.ContainsKey("TEMA"));
+        Assert.False(results[1].Indicators.ContainsKey("TEMA"));
+        Assert.False(results[2].Indicators.ContainsKey("TEMA"));
+        Assert.Equal(40m, Math.Round(results[3].Indicators["TEMA"], 2));
+        Assert.Equal(50m, Math.Round(results[4].Indicators["TEMA"], 2));
+        Assert.Equal(60m, Math.Round(results[5].Indicators["TEMA"], 2));
     }
 
     [Fact]
-    public async Task T3_ProducesValueAfterWarmup()
+    public async Task TRIMA_WithValidPeriod_ReturnsExpectedValues()
     {
-        const int period = 3;
         var results = new List<EnrichedCandle>();
-        var block = MovingAverage.T3("T3", period);
+        var trima = MovingAverage.TRIMA("TRIMA", 4);
         var sink = CreateSink(results);
-        block.LinkTo(sink, new DataflowLinkOptions { PropagateCompletion = true });
+        trima.LinkTo(sink, new DataflowLinkOptions { PropagateCompletion = true });
 
-        for (var i = 0; i < 15; i++)
+        var candles = new[]
         {
-            var close = 100m + i;
-            await block.SendAsync(MakeCandle(close - 1m, close + 1m, close - 2m, close, dayOffset: i));
+            Enrich(10m, 0),
+            Enrich(20m, 1),
+            Enrich(30m, 2),
+            Enrich(40m, 3),
+            Enrich(50m, 4),
+            Enrich(60m, 5),
+        };
+
+        foreach (var candle in candles)
+        {
+            await trima.SendAsync(candle);
         }
 
-        block.Complete();
+        trima.Complete();
         await sink.Completion;
 
-        for (var i = 0; i < 12; i++)
-        {
-            Assert.False(results[i].Indicators.ContainsKey("T3"));
-        }
-
-        Assert.True(results[12].Indicators.ContainsKey("T3"));
-        Assert.InRange(results[results.Count - 1].Indicators["T3"], 100m, 114m);
+        Assert.False(results[0].Indicators.ContainsKey("TRIMA"));
+        Assert.False(results[1].Indicators.ContainsKey("TRIMA"));
+        Assert.False(results[2].Indicators.ContainsKey("TRIMA"));
+        Assert.Equal(25m, results[3].Indicators["TRIMA"]);
+        Assert.Equal(35m, results[4].Indicators["TRIMA"]);
+        Assert.Equal(45m, results[5].Indicators["TRIMA"]);
     }
 
     [Fact]
-    public async Task TRIMA_ProducesValueAfterWarmupAndMatchesConstantValue()
+    public async Task KAMA_WithValidPeriod_ReturnsExpectedValues()
     {
-        const int period = 5;
         var results = new List<EnrichedCandle>();
-        var block = MovingAverage.TRIMA("TRIMA", period);
+        var kama = MovingAverage.KAMA("KAMA", 3);
         var sink = CreateSink(results);
-        block.LinkTo(sink, new DataflowLinkOptions { PropagateCompletion = true });
+        kama.LinkTo(sink, new DataflowLinkOptions { PropagateCompletion = true });
 
-        for (var i = 0; i < 10; i++)
+        var candles = new[]
         {
-            await block.SendAsync(MakeCandle(80m, 81m, 79m, 80m, dayOffset: i));
+            Enrich(10m, 0),
+            Enrich(20m, 1),
+            Enrich(30m, 2),
+            Enrich(40m, 3),
+            Enrich(50m, 4),
+            Enrich(60m, 5),
+            Enrich(70m, 6),
+        };
+
+        foreach (var candle in candles)
+        {
+            await kama.SendAsync(candle);
         }
 
-        block.Complete();
+        kama.Complete();
         await sink.Completion;
 
-        for (var i = 0; i < 4; i++)
-        {
-            Assert.False(results[i].Indicators.ContainsKey("TRIMA"));
-        }
-
-        Assert.True(results[4].Indicators.ContainsKey("TRIMA"));
-        Assert.Equal(80m, results[4].Indicators["TRIMA"]);
-        Assert.Equal(80m, results[results.Count - 1].Indicators["TRIMA"]);
+        Assert.False(results[0].Indicators.ContainsKey("KAMA"));
+        Assert.False(results[1].Indicators.ContainsKey("KAMA"));
+        Assert.False(results[2].Indicators.ContainsKey("KAMA"));
+        Assert.Equal(40m, results[3].Indicators["KAMA"]);
+        Assert.Equal(44.4444m, Math.Round(results[4].Indicators["KAMA"], 4));
+        Assert.Equal(59.6433m, Math.Round(results[6].Indicators["KAMA"], 4));
     }
 
     [Fact]
-    public async Task KAMA_ProducesValueAfterWarmupAndStaysWithinTrendRange()
+    public async Task T3_WithValidPeriod_ReturnsExpectedValues()
     {
-        const int period = 5;
         var results = new List<EnrichedCandle>();
-        var block = MovingAverage.KAMA("KAMA", period);
+        var t3 = MovingAverage.T3("T3", 2, 0.7m);
         var sink = CreateSink(results);
-        block.LinkTo(sink, new DataflowLinkOptions { PropagateCompletion = true });
+        t3.LinkTo(sink, new DataflowLinkOptions { PropagateCompletion = true });
 
-        for (var i = 0; i < 12; i++)
+        var candles = new[]
         {
-            var close = 100m + i;
-            await block.SendAsync(MakeCandle(close - 1m, close + 1m, close - 2m, close, dayOffset: i));
+            Enrich(10m, 0),
+            Enrich(20m, 1),
+            Enrich(30m, 2),
+            Enrich(40m, 3),
+            Enrich(50m, 4),
+            Enrich(60m, 5),
+            Enrich(70m, 6),
+            Enrich(80m, 7),
+            Enrich(90m, 8),
+            Enrich(100m, 9),
+            Enrich(110m, 10),
+            Enrich(120m, 11),
+        };
+
+        foreach (var candle in candles)
+        {
+            await t3.SendAsync(candle);
         }
 
-        block.Complete();
+        t3.Complete();
         await sink.Completion;
 
-        for (var i = 0; i < 5; i++)
-        {
-            Assert.False(results[i].Indicators.ContainsKey("KAMA"));
-        }
+        Assert.False(results[0].Indicators.ContainsKey("T3"));
+        Assert.False(results[1].Indicators.ContainsKey("T3"));
+        Assert.False(results[2].Indicators.ContainsKey("T3"));
+        Assert.False(results[3].Indicators.ContainsKey("T3"));
+        Assert.False(results[4].Indicators.ContainsKey("T3"));
+        Assert.False(results[5].Indicators.ContainsKey("T3"));
+        Assert.True(results[6].Indicators.ContainsKey("T3"));
+        Assert.Equal(65.5m, Math.Round(results[6].Indicators["T3"], 1));
+        Assert.Equal(105.5m, Math.Round(results[10].Indicators["T3"], 1));
+        Assert.Equal(115.5m, Math.Round(results[11].Indicators["T3"], 1));
+    }
 
-        Assert.True(results[5].Indicators.ContainsKey("KAMA"));
-        Assert.True(results[results.Count - 1].Indicators.ContainsKey("KAMA"));
-        Assert.True(results[results.Count - 1].Indicators["KAMA"] > results[5].Indicators["KAMA"]);
-        Assert.InRange(results[results.Count - 1].Indicators["KAMA"], results[5].Indicators["KAMA"], 111m);
+    [Fact]
+    public void DEMA_WithPeriodLessThanOne_Throws()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            MovingAverage.DEMA("DEMA", 0));
+    }
+
+    [Fact]
+    public void TRIMA_WithPeriodLessThanTwo_Throws()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            MovingAverage.TRIMA("TRIMA", 1));
+    }
+
+    [Fact]
+    public void KAMA_WithPeriodLessThanTwo_Throws()
+    {
+        Assert.Throws<ArgumentOutOfRangeException>(() =>
+            MovingAverage.KAMA("KAMA", 1));
     }
 
     private static ActionBlock<EnrichedCandle> CreateSink(List<EnrichedCandle> results) =>
         new(item => results.Add(item));
 
-    private static EnrichedCandle MakeCandle(
-        decimal open,
-        decimal high,
-        decimal low,
-        decimal close,
-        long volume = 1000,
-        int dayOffset = 0) =>
-        new(new Candle
-        {
-            Timestamp = BaseTime.AddDays(dayOffset),
-            Open = open,
-            High = high,
-            Low = low,
-            Close = close,
-            Volume = volume,
-        });
+    private static EnrichedCandle Enrich(decimal close, int dayOffset = 0) => new(new Candle
+    {
+        Timestamp = BaseTime.AddDays(dayOffset),
+        Open = close,
+        High = close,
+        Low = close,
+        Close = close,
+        Volume = 1000,
+    });
 }
