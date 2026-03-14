@@ -24,18 +24,18 @@ public static class MovingAverage
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(period, 1);
 
-        var window = new Queue<Candle>(period);
+        var window = new Queue<decimal>(period);
         var sum = 0m;
 
         var block = new ActionBlock<Candle>(
             async candle =>
             {
                 sum += candle.Close;
-                window.Enqueue(candle);
+                window.Enqueue(candle.Close);
 
                 if (window.Count > period)
                 {
-                    sum -= window.Dequeue().Close;
+                    sum -= window.Dequeue();
                 }
 
                 if (window.Count == period)
@@ -49,9 +49,7 @@ public static class MovingAverage
                 MaxDegreeOfParallelism = 1,
             });
 
-        // Propagate completion to the target block.
-        block.Completion.ContinueWith(
-            t => target.Complete(), cancellationToken, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Default);
+        _ = DataflowHelpers.PropagateCompletionAsync(block, target);
 
         return block;
     }
@@ -106,8 +104,7 @@ public static class MovingAverage
                 MaxDegreeOfParallelism = 1,
             });
 
-        block.Completion.ContinueWith(
-            t => target.Complete(), cancellationToken, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Default);
+        _ = DataflowHelpers.PropagateCompletionAsync(block, target);
 
         return block;
     }
@@ -163,8 +160,7 @@ public static class MovingAverage
                 MaxDegreeOfParallelism = 1,
             });
 
-        block.Completion.ContinueWith(
-            t => target.Complete(), cancellationToken, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Default);
+        _ = DataflowHelpers.PropagateCompletionAsync(block, target);
 
         return block;
     }
@@ -190,37 +186,36 @@ public static class MovingAverage
         var halfPeriod = period / 2;
         var sqrtPeriod = Math.Max(1, (int)Math.Round(Math.Sqrt(period)));
 
-        var priceWindow = new Queue<decimal>(period);
-        var diffWindow = new Queue<decimal>(sqrtPeriod);
+        // Circular buffers to avoid per-candle allocations.
+        var priceBuffer = new decimal[period];
+        var priceIndex = 0;
+        var priceCount = 0;
+
+        var diffBuffer = new decimal[sqrtPeriod];
+        var diffIndex = 0;
+        var diffCount = 0;
 
         var block = new ActionBlock<Candle>(
             async candle =>
             {
-                priceWindow.Enqueue(candle.Close);
+                priceBuffer[priceIndex] = candle.Close;
+                priceIndex = (priceIndex + 1) % period;
+                priceCount = Math.Min(priceCount + 1, period);
 
-                if (priceWindow.Count > period)
+                if (priceCount == period)
                 {
-                    priceWindow.Dequeue();
-                }
-
-                if (priceWindow.Count == period)
-                {
-                    var prices = priceWindow.ToArray();
-                    var wmaFull = ComputeWMA(prices, 0, period);
-                    var wmaHalf = ComputeWMA(prices, period - halfPeriod, halfPeriod);
+                    // Oldest element is at priceIndex (it just wrapped).
+                    var wmaFull = ComputeWMACircular(priceBuffer, priceIndex, period);
+                    var wmaHalf = ComputeWMACircular(priceBuffer, (priceIndex + period - halfPeriod) % period, halfPeriod);
                     var diff = (2m * wmaHalf) - wmaFull;
 
-                    diffWindow.Enqueue(diff);
+                    diffBuffer[diffIndex] = diff;
+                    diffIndex = (diffIndex + 1) % sqrtPeriod;
+                    diffCount = Math.Min(diffCount + 1, sqrtPeriod);
 
-                    if (diffWindow.Count > sqrtPeriod)
+                    if (diffCount == sqrtPeriod)
                     {
-                        diffWindow.Dequeue();
-                    }
-
-                    if (diffWindow.Count == sqrtPeriod)
-                    {
-                        var diffs = diffWindow.ToArray();
-                        var hma = ComputeWMA(diffs, 0, sqrtPeriod);
+                        var hma = ComputeWMACircular(diffBuffer, diffIndex, sqrtPeriod);
                         await target.SendAsync((candle.Timestamp, hma), cancellationToken);
                     }
                 }
@@ -231,19 +226,19 @@ public static class MovingAverage
                 MaxDegreeOfParallelism = 1,
             });
 
-        block.Completion.ContinueWith(
-            t => target.Complete(), cancellationToken, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Default);
+        _ = DataflowHelpers.PropagateCompletionAsync(block, target);
 
         return block;
     }
 
-    private static decimal ComputeWMA(decimal[] values, int start, int count)
+    private static decimal ComputeWMACircular(decimal[] buffer, int startIndex, int count)
     {
         var weightedSum = 0m;
+        var length = buffer.Length;
 
         for (var i = 0; i < count; i++)
         {
-            weightedSum += values[start + i] * (i + 1);
+            weightedSum += buffer[(startIndex + i) % length] * (i + 1);
         }
 
         return weightedSum / (count * (count + 1) / 2m);

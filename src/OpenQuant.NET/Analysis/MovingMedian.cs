@@ -26,21 +26,28 @@ public static class MovingMedian
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(period, 1);
 
-        var window = new Queue<decimal>(period);
+        var insertionOrder = new Queue<decimal>(period);
+        var sorted = new List<decimal>(period);
 
         var block = new ActionBlock<Candle>(
             async candle =>
             {
-                window.Enqueue(candle.Close);
+                insertionOrder.Enqueue(candle.Close);
 
-                if (window.Count > period)
+                // Binary-search insert to maintain sorted order — O(n) due to list shift,
+                // but avoids the O(n log n) full sort that was here before.
+                var insertAt = sorted.BinarySearch(candle.Close);
+                sorted.Insert(insertAt >= 0 ? insertAt : ~insertAt, candle.Close);
+
+                if (insertionOrder.Count > period)
                 {
-                    window.Dequeue();
+                    var removed = insertionOrder.Dequeue();
+                    var removeAt = sorted.BinarySearch(removed);
+                    sorted.RemoveAt(removeAt);
                 }
 
-                if (window.Count == period)
+                if (insertionOrder.Count == period)
                 {
-                    var sorted = window.Order().ToArray();
                     var mid = period / 2;
 
                     var median = period % 2 == 0
@@ -56,9 +63,7 @@ public static class MovingMedian
                 MaxDegreeOfParallelism = 1,
             });
 
-        // Propagate completion to the target block.
-        block.Completion.ContinueWith(
-            t => target.Complete(), cancellationToken, TaskContinuationOptions.OnlyOnRanToCompletion, TaskScheduler.Default);
+        _ = DataflowHelpers.PropagateCompletionAsync(block, target);
 
         return block;
     }
