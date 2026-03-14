@@ -411,4 +411,37 @@ public static class AdvancedIndicators
                 MaxDegreeOfParallelism = 1,
             });
     }
+
+#pragma warning disable S3400 // Lookback API requires methods even when the result is constant.
+
+    // Lookback methods
+
+    /// <summary>Returns the number of input bars consumed before <see cref="Sar"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int SarLookback() => 1;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="HtTrendline"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int HtTrendlineLookback() => 6;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="HtDcPeriod"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int HtDcPeriodLookback() => 32;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="HtDcPhase"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int HtDcPhaseLookback() => 32;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="HtPhasor"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int HtPhasorLookback() => 32;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="HtSine"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int HtSineLookback() => 32;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="HtTrendMode"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int HtTrendModeLookback() => 32;
+#pragma warning restore S3400
 }

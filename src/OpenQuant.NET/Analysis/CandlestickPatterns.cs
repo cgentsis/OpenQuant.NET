@@ -2369,4 +2369,259 @@ public static class CandlestickPatterns
                 MaxDegreeOfParallelism = 1,
             });
     }
+
+#pragma warning disable S3400 // Lookback API requires methods even when the result is constant.
+
+    // Lookback methods
+
+    // 0-bar lookback (single candle patterns)
+
+    /// <summary>Returns the number of input bars consumed before <see cref="Doji"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int DojiLookback() => 0;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="DragonflyDoji"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int DragonflyDojiLookback() => 0;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="GravestoneDoji"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int GravestoneDojiLookback() => 0;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="LongLeggedDoji"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int LongLeggedDojiLookback() => 0;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="Hammer"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int HammerLookback() => 0;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="InvertedHammer"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int InvertedHammerLookback() => 0;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="HangingMan"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int HangingManLookback() => 0;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="ShootingStar"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int ShootingStarLookback() => 0;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="Marubozu"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int MarubozuLookback() => 0;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="ClosingMarubozu"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int ClosingMarubozuLookback() => 0;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="SpinningTop"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int SpinningTopLookback() => 0;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="LongLine"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int LongLineLookback() => 0;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="ShortLine"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int ShortLineLookback() => 0;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="RickshawMan"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int RickshawManLookback() => 0;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="HighWave"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int HighWaveLookback() => 0;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="Takuri"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int TakuriLookback() => 0;
+
+    // 1-bar lookback (two candle patterns)
+
+    /// <summary>Returns the number of input bars consumed before <see cref="Engulfing"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int EngulfingLookback() => 1;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="Harami"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int HaramiLookback() => 1;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="HaramiCross"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int HaramiCrossLookback() => 1;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="Piercing"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int PiercingLookback() => 1;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="DarkCloudCover"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int DarkCloudCoverLookback() => 1;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="DojiStar"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int DojiStarLookback() => 1;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="BeltHold"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int BeltHoldLookback() => 1;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="Kicking"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int KickingLookback() => 1;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="KickingByLength"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int KickingByLengthLookback() => 1;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="MatchingLow"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int MatchingLowLookback() => 1;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="HomingPigeon"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int HomingPigeonLookback() => 1;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="Counterattack"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int CounterattackLookback() => 1;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="Thrusting"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int ThrustingLookback() => 1;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="InNeck"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int InNeckLookback() => 1;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="OnNeck"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int OnNeckLookback() => 1;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="SeparatingLines"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int SeparatingLinesLookback() => 1;
+
+    // 2-bar lookback (three candle patterns)
+
+    /// <summary>Returns the number of input bars consumed before <see cref="MorningStar"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int MorningStarLookback() => 2;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="EveningStar"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int EveningStarLookback() => 2;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="MorningDojiStar"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int MorningDojiStarLookback() => 2;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="EveningDojiStar"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int EveningDojiStarLookback() => 2;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="ThreeWhiteSoldiers"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int ThreeWhiteSoldiersLookback() => 2;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="ThreeBlackCrows"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int ThreeBlackCrowsLookback() => 2;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="Tristar"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int TristarLookback() => 2;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="StickSandwich"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int StickSandwichLookback() => 2;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="TwoCrows"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int TwoCrowsLookback() => 2;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="ThreeInside"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int ThreeInsideLookback() => 2;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="ThreeStarsInSouth"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int ThreeStarsInSouthLookback() => 2;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="AbandonedBaby"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int AbandonedBabyLookback() => 2;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="AdvanceBlock"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int AdvanceBlockLookback() => 2;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="GapSideSideWhite"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int GapSideSideWhiteLookback() => 2;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="Hikkake"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int HikkakeLookback() => 2;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="HikkakeMod"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int HikkakeModLookback() => 2;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="IdenticalThreeCrows"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int IdenticalThreeCrowsLookback() => 2;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="StalledPattern"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int StalledPatternLookback() => 2;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="TasukiGap"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int TasukiGapLookback() => 2;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="Unique3River"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int Unique3RiverLookback() => 2;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="UpsideGap2Crows"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int UpsideGap2CrowsLookback() => 2;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="XSideGap3Methods"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int XSideGap3MethodsLookback() => 2;
+
+    // 3-bar lookback (four candle patterns)
+
+    /// <summary>Returns the number of input bars consumed before <see cref="ThreeLineStrike"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int ThreeLineStrikeLookback() => 3;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="ConcealingBabySwallow"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int ConcealingBabySwallowLookback() => 3;
+
+    // 4-bar lookback (five candle patterns)
+
+    /// <summary>Returns the number of input bars consumed before <see cref="Breakaway"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int BreakawayLookback() => 4;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="LadderBottom"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int LadderBottomLookback() => 4;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="MatHold"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int MatHoldLookback() => 4;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="RisingFallingThreeMethods"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int RisingFallingThreeMethodsLookback() => 4;
+#pragma warning restore S3400
 }

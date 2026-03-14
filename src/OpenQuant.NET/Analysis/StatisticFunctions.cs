@@ -502,4 +502,54 @@ public static class StatisticFunctions
 
         return (slope, intercept);
     }
+
+#pragma warning disable SA1202 // Lookback methods are intentionally kept at the end of the class.
+
+    // Lookback methods
+
+    /// <summary>Returns the number of input bars consumed before <see cref="Var"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int VarLookback(int period) => period - 1;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="StdDev"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int StdDevLookback(int period) => period - 1;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="LinearReg"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int LinearRegLookback(int period) => period - 1;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="LinearRegAngle"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int LinearRegAngleLookback(int period) => period - 1;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="LinearRegIntercept"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int LinearRegInterceptLookback(int period) => period - 1;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="LinearRegSlope"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int LinearRegSlopeLookback(int period) => period - 1;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="Tsf"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int TsfLookback(int period) => period - 1;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="Correl"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int CorrelLookback(int period) => period - 1;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="Beta"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int BetaLookback(int period) => period;
+#pragma warning restore SA1202
 }

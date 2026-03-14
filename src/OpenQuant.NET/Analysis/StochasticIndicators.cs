@@ -290,4 +290,27 @@ public static class StochasticIndicators
                 MaxDegreeOfParallelism = 1,
             });
     }
+
+    // Lookback methods
+
+    /// <summary>Returns the number of input bars consumed before <see cref="Stoch"/> produces its first value.</summary>
+    /// <param name="fastKPeriod">The fast K period.</param>
+    /// <param name="slowKPeriod">The slow K period.</param>
+    /// <param name="slowDPeriod">The slow D period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int StochLookback(int fastKPeriod = 5, int slowKPeriod = 3, int slowDPeriod = 3) => (fastKPeriod - 1) + (slowKPeriod - 1) + (slowDPeriod - 1);
+
+    /// <summary>Returns the number of input bars consumed before <see cref="StochF"/> produces its first value.</summary>
+    /// <param name="fastKPeriod">The fast K period.</param>
+    /// <param name="fastDPeriod">The fast D period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int StochFLookback(int fastKPeriod = 5, int fastDPeriod = 3) => (fastKPeriod - 1) + (fastDPeriod - 1);
+
+    /// <summary>Returns the number of input bars consumed before <see cref="StochRsi"/> produces its first value.</summary>
+    /// <param name="rsiPeriod">The RSI period.</param>
+    /// <param name="stochPeriod">The stochastic period.</param>
+    /// <param name="kPeriod">The K period.</param>
+    /// <param name="dPeriod">The D period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int StochRsiLookback(int rsiPeriod = 14, int stochPeriod = 14, int kPeriod = 3, int dPeriod = 3) => rsiPeriod + (stochPeriod - 1) + (kPeriod - 1) + (dPeriod - 1);
 }

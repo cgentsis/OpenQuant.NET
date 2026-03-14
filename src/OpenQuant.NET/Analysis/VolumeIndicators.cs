@@ -242,4 +242,28 @@ public static class VolumeIndicators
                 MaxDegreeOfParallelism = 1,
             });
     }
+
+#pragma warning disable S3400 // Lookback API requires methods even when the result is constant.
+
+    // Lookback methods
+
+    /// <summary>Returns the number of input bars consumed before <see cref="Obv"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int ObvLookback() => 0;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="Ad"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int AdLookback() => 0;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="AdOsc"/> produces its first value.</summary>
+    /// <param name="fastPeriod">The fast period.</param>
+    /// <param name="slowPeriod">The slow period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int AdOscLookback(int fastPeriod = 3, int slowPeriod = 10) => slowPeriod - 1;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="Mfi"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int MfiLookback(int period = 14) => period;
+#pragma warning restore S3400
 }

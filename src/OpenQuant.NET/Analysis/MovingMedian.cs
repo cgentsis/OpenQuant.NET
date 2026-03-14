@@ -61,4 +61,11 @@ public static class MovingMedian
                 MaxDegreeOfParallelism = 1,
             });
     }
+
+    // Lookback methods
+
+    /// <summary>Returns the number of input bars consumed before <see cref="Median"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int MedianLookback(int period) => period - 1;
 }

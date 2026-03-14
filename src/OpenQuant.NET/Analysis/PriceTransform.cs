@@ -169,4 +169,33 @@ public static class PriceTransform
                 MaxDegreeOfParallelism = 1,
             });
     }
+
+#pragma warning disable S3400 // Lookback API requires methods even when the result is constant.
+
+    // Lookback methods
+
+    /// <summary>Returns the number of input bars consumed before <see cref="AvgPrice"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int AvgPriceLookback() => 0;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="MedPrice"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int MedPriceLookback() => 0;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="TypPrice"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int TypPriceLookback() => 0;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="WclPrice"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int WclPriceLookback() => 0;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="Bop"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int BopLookback() => 0;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="TrueRange"/> produces its first value.</summary>
+    /// <returns>The lookback count.</returns>
+    public static int TrueRangeLookback() => 1;
+#pragma warning restore S3400
 }

@@ -695,4 +695,70 @@ public static class MomentumOscillators
             return true;
         }
     }
+
+#pragma warning disable SA1201 // Lookback methods are intentionally kept at the end of the class.
+
+    // Lookback methods
+
+    /// <summary>Returns the number of input bars consumed before <see cref="Apo"/> produces its first value.</summary>
+    /// <param name="fastPeriod">The fast period.</param>
+    /// <param name="slowPeriod">The slow period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int ApoLookback(int fastPeriod, int slowPeriod) => slowPeriod - 1;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="Ppo"/> produces its first value.</summary>
+    /// <param name="fastPeriod">The fast period.</param>
+    /// <param name="slowPeriod">The slow period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int PpoLookback(int fastPeriod, int slowPeriod) => slowPeriod - 1;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="Macd"/> produces its first value.</summary>
+    /// <param name="fastPeriod">The fast period.</param>
+    /// <param name="slowPeriod">The slow period.</param>
+    /// <param name="signalPeriod">The signal period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int MacdLookback(int fastPeriod = 12, int slowPeriod = 26, int signalPeriod = 9) => (slowPeriod - 1) + (signalPeriod - 1);
+
+    /// <summary>Returns the number of input bars consumed before <see cref="Rsi"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int RsiLookback(int period = 14) => period;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="Cmo"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int CmoLookback(int period) => period;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="Cci"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int CciLookback(int period) => period - 1;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="WillR"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int WillRLookback(int period) => period - 1;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="UltOsc"/> produces its first value.</summary>
+    /// <param name="period1">The first period.</param>
+    /// <param name="period2">The second period.</param>
+    /// <param name="period3">The third period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int UltOscLookback(int period1 = 7, int period2 = 14, int period3 = 28) => Math.Max(Math.Max(period1, period2), period3) + 1;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="Trix"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int TrixLookback(int period) => (3 * (period - 1)) + 1;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="Aroon"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int AroonLookback(int period) => period;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="AroonOsc"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int AroonOscLookback(int period) => period;
+#pragma warning restore SA1201
 }

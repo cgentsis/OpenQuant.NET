@@ -640,4 +640,44 @@ public static class DirectionalMovement
             }
         }
     }
+
+#pragma warning disable SA1202 // Lookback methods are intentionally kept at the end of the class.
+
+    // Lookback methods
+
+    /// <summary>Returns the number of input bars consumed before <see cref="PlusDM"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int PlusDMLookback(int period = 14) => period;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="MinusDM"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int MinusDMLookback(int period = 14) => period;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="PlusDI"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int PlusDILookback(int period = 14) => period;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="MinusDI"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int MinusDILookback(int period = 14) => period;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="Dx"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int DxLookback(int period = 14) => period;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="Adx"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int AdxLookback(int period = 14) => (2 * period) - 1;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="Adxr"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int AdxrLookback(int period = 14) => (3 * period) - 2;
+#pragma warning restore SA1202
 }

@@ -191,4 +191,21 @@ public static class VolatilityIndicators
                 MaxDegreeOfParallelism = 1,
             });
     }
+
+    // Lookback methods
+
+    /// <summary>Returns the number of input bars consumed before <see cref="Atr"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int AtrLookback(int period = 14) => period;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="Natr"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int NatrLookback(int period = 14) => period;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="BBands"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int BBandsLookback(int period = 20) => period - 1;
 }

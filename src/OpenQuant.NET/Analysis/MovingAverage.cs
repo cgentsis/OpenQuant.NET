@@ -614,4 +614,54 @@ public static class MovingAverage
 
         return weightedSum / (count * (count + 1) / 2m);
     }
+
+#pragma warning disable SA1202 // Lookback methods are intentionally kept at the end of the class.
+
+    // Lookback methods
+
+    /// <summary>Returns the number of input bars consumed before <see cref="SMA"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int SMALookback(int period) => period - 1;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="EMA"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int EMALookback(int period) => period - 1;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="WMA"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int WMALookback(int period) => period - 1;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="HMA"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int HMALookback(int period) => (period - 1) + ((int)Math.Floor(Math.Sqrt(period)) - 1);
+
+    /// <summary>Returns the number of input bars consumed before <see cref="DEMA"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int DEMALookback(int period) => 2 * (period - 1);
+
+    /// <summary>Returns the number of input bars consumed before <see cref="TEMA"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int TEMALookback(int period) => 3 * (period - 1);
+
+    /// <summary>Returns the number of input bars consumed before <see cref="T3"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int T3Lookback(int period) => 6 * (period - 1);
+
+    /// <summary>Returns the number of input bars consumed before <see cref="TRIMA"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int TRIMALookback(int period) => period - 1;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="KAMA"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int KAMALookback(int period) => period;
+#pragma warning restore SA1202
 }

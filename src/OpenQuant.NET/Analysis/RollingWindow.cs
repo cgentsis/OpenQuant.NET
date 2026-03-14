@@ -675,4 +675,76 @@ public static class RollingWindow
                 MaxDegreeOfParallelism = 1,
             });
     }
+
+    // Lookback methods
+
+    /// <summary>Returns the number of input bars consumed before <see cref="Sum"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int SumLookback(int period) => period - 1;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="Max"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int MaxLookback(int period) => period - 1;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="Min"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int MinLookback(int period) => period - 1;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="MaxIndex"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int MaxIndexLookback(int period) => period - 1;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="MinIndex"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int MinIndexLookback(int period) => period - 1;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="MinMax"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int MinMaxLookback(int period) => period - 1;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="MinMaxIndex"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int MinMaxIndexLookback(int period) => period - 1;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="MidPoint"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int MidPointLookback(int period) => period - 1;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="MidPrice"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int MidPriceLookback(int period) => period - 1;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="Mom"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int MomLookback(int period) => period;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="Roc"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int RocLookback(int period) => period;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="Rocp"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int RocpLookback(int period) => period;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="Rocr"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int RocrLookback(int period) => period;
+
+    /// <summary>Returns the number of input bars consumed before <see cref="Rocr100"/> produces its first value.</summary>
+    /// <param name="period">The period.</param>
+    /// <returns>The lookback count.</returns>
+    public static int Rocr100Lookback(int period) => period;
 }
