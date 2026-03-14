@@ -1,0 +1,71 @@
+name: Build, Test & Publish NuGet
+
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+
+env:
+  DOTNET_NOLOGO: true
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  PROJECT_PATH: src/OpenQuant.NET/OpenQuant.NET.csproj
+
+jobs:
+  build-test-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "9.0.x"
+
+      - name: Restore
+        run: dotnet restore
+
+      - name: Build
+        run: dotnet build --no-restore --configuration Release
+
+      - name: Test
+        run: dotnet test --no-build --configuration Release --filter "Category!=Integration"
+
+      - name: Determine version
+        id: version
+        run: |
+          # Read base version from csproj
+          BASE_VERSION=$(grep -oP '(?<=<Version>)[^<]+' ${{ env.PROJECT_PATH }})
+          MAJOR=$(echo "$BASE_VERSION" | cut -d. -f1)
+          MINOR=$(echo "$BASE_VERSION" | cut -d. -f2)
+
+          # Auto-increment patch using the number of commits on main
+          PATCH=$(git rev-list --count HEAD)
+
+          VERSION="${MAJOR}.${MINOR}.${PATCH}"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "📦 Package version: $VERSION"
+
+      - name: Pack
+        run: |
+          dotnet pack ${{ env.PROJECT_PATH }} \
+            --no-build \
+            --configuration Release \
+            -p:PackageVersion=${{ steps.version.outputs.version }} \
+            --output ./nupkg
+
+      - name: Publish to NuGet
+        run: |
+          dotnet nuget push ./nupkg/*.nupkg \
+            --api-key ${{ secrets.NUGET_API_KEY }} \
+            --source https://api.nuget.org/v3/index.json \
+            --skip-duplicate
+
+      - name: Tag release
+        run: |
+          git tag "v${{ steps.version.outputs.version }}"
+          git push origin "v${{ steps.version.outputs.version }}"
