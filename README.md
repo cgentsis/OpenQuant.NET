@@ -67,46 +67,55 @@ Console.WriteLine($"MSFT latest close: {latest?.Close}");
 
 ### Computing Technical Indicators
 
-All indicators are built on [TPL Dataflow](https://learn.microsoft.com/en-us/dotnet/standard/parallel-programming/dataflow-task-parallel-library) `ActionBlock<T>`, making them composable in streaming pipelines.
+All indicators are built on [TPL Dataflow](https://learn.microsoft.com/en-us/dotnet/standard/parallel-programming/dataflow-task-parallel-library) `TransformBlock<EnrichedCandle, EnrichedCandle>`, making them chainable pipeline stages via `LinkTo`.
 
 ```csharp
 using System.Threading.Tasks.Dataflow;
 using OpenQuant.Analysis;
+using OpenQuant.Models;
 
-// Create an output buffer and a 20‑period SMA block
-var output = new BufferBlock<(DateTimeOffset Timestamp, decimal Value)>();
-var sma = MovingAverage.SMAActionBlockFactory(period: 20, target: output);
+// Create a pipeline: SMA(20) → EMA(12) → sink
+var sma = MovingAverage.SMA("SMA20", period: 20);
+var ema = MovingAverage.EMA("EMA12", period: 12);
+var results = new List<EnrichedCandle>();
+var sink = new ActionBlock<EnrichedCandle>(e => results.Add(e));
 
-// Feed candles into the block
+sma.LinkTo(ema, new DataflowLinkOptions { PropagateCompletion = true });
+ema.LinkTo(sink, new DataflowLinkOptions { PropagateCompletion = true });
+
+// Feed candles — each one flows through every stage
 foreach (var candle in candles)
 {
-    await sma.SendAsync(candle);
+    await sma.SendAsync(new EnrichedCandle(candle));
 }
 
 sma.Complete();
-await sma.Completion;
+await sink.Completion;
 
-// Read SMA results
-while (output.TryReceive(out var point))
+// Each EnrichedCandle has the original candle + computed indicators
+foreach (var e in results)
 {
-    Console.WriteLine($"{point.Timestamp:yyyy-MM-dd}  SMA(20): {point.Value:F2}");
+    Console.WriteLine($"{e.Candle.Timestamp:yyyy-MM-dd}  Close={e.Candle.Close}  {string.Join("  ", e.Indicators)}");
 }
 ```
 
-The same pattern applies to all indicators — swap the factory method:
+Available indicator factories:
 
 ```csharp
+// Simple Moving Average
+var sma = MovingAverage.SMA("SMA20", period: 20);
+
 // Exponential Moving Average
-var ema = MovingAverage.EMAActionBlockFactory(period: 12, target: output);
+var ema = MovingAverage.EMA("EMA12", period: 12);
 
 // Weighted Moving Average
-var wma = MovingAverage.WMAActionBlockFactory(period: 10, target: output);
+var wma = MovingAverage.WMA("WMA10", period: 10);
 
 // Hull Moving Average (period must be ≥ 2)
-var hma = MovingAverage.HMAActionBlockFactory(period: 16, target: output);
+var hma = MovingAverage.HMA("HMA16", period: 16);
 
 // Moving Median
-var median = MovingMedian.MedianActionBlockFactory(period: 5, target: output);
+var median = MovingMedian.Median("Med5", period: 5);
 ```
 
 ### Implementing a Custom Data Provider
@@ -200,16 +209,16 @@ Both are configured in `Directory.Build.props` with `TreatWarningsAsErrors=true`
 
 | Method | Returns | Description |
 |---|---|---|
-| `SMAActionBlockFactory(period, target)` | `ActionBlock<Candle>` | Simple moving average over `period` closing prices |
-| `EMAActionBlockFactory(period, target)` | `ActionBlock<Candle>` | Exponential moving average; seeds with SMA, then applies smoothing factor `2/(period+1)` |
-| `WMAActionBlockFactory(period, target)` | `ActionBlock<Candle>` | Weighted moving average with linearly increasing weights (oldest=1, newest=period) |
-| `HMAActionBlockFactory(period, target)` | `ActionBlock<Candle>` | Hull moving average — `WMA(√n)` of `2×WMA(n/2) − WMA(n)` — period must be ≥ 2 |
+| `SMA(name, period)` | `TransformBlock<EnrichedCandle, EnrichedCandle>` | Simple moving average over `period` closing prices |
+| `EMA(name, period)` | `TransformBlock<EnrichedCandle, EnrichedCandle>` | Exponential moving average; seeds with SMA, smoothing factor `2/(period+1)` |
+| `WMA(name, period)` | `TransformBlock<EnrichedCandle, EnrichedCandle>` | Weighted moving average with linearly increasing weights |
+| `HMA(name, period)` | `TransformBlock<EnrichedCandle, EnrichedCandle>` | Hull moving average — `WMA(√n)` of `2×WMA(n/2) − WMA(n)` — period ≥ 2 |
 
 ### `MovingMedian`
 
 | Method | Returns | Description |
 |---|---|---|
-| `MedianActionBlockFactory(period, target)` | `ActionBlock<Candle>` | Moving median of closing prices; averages the two middle values for even periods |
+| `Median(name, period)` | `TransformBlock<EnrichedCandle, EnrichedCandle>` | Moving median; averages the two middle values for even periods |
 
 ### `YahooFinanceProvider`
 

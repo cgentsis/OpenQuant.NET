@@ -4,24 +4,24 @@ using OpenQuant.Models;
 namespace OpenQuant.Analysis;
 
 /// <summary>
-/// Provides moving median calculations as TPL Dataflow blocks.
+/// Provides moving median calculations as a TPL Dataflow <see cref="TransformBlock{TInput,TOutput}"/> stage.
 /// </summary>
 public static class MovingMedian
 {
     /// <summary>
-    /// Creates an <see cref="ActionBlock{Candle}"/> that computes the moving median
-    /// of closing prices over the specified period and forwards each result to <paramref name="target"/>.
+    /// Creates a <see cref="TransformBlock{EnrichedCandle, EnrichedCandle}"/> that computes the
+    /// moving median of closing prices over the specified period.
     /// For an odd period the middle value is returned; for an even period the average of the two
     /// middle values is returned.
     /// </summary>
+    /// <param name="name">The key under which the value is stored in <see cref="EnrichedCandle.Indicators"/>.</param>
     /// <param name="period">The number of data points in the window.</param>
-    /// <param name="target">The target block that receives computed median values.</param>
     /// <param name="cancellationToken">Optional cancellation token.</param>
-    /// <returns>An <see cref="ActionBlock{Candle}"/> to which candles should be posted in chronological order.</returns>
+    /// <returns>A transform block to use as a pipeline stage.</returns>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when period is less than 1.</exception>
-    public static ActionBlock<Candle> MedianActionBlockFactory(
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> Median(
+        string name,
         int period,
-        ITargetBlock<(DateTimeOffset Timestamp, decimal Value)> target,
         CancellationToken cancellationToken = default)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(period, 1);
@@ -29,15 +29,13 @@ public static class MovingMedian
         var insertionOrder = new Queue<decimal>(period);
         var sorted = new List<decimal>(period);
 
-        var block = new ActionBlock<Candle>(
-            async candle =>
+        return new TransformBlock<EnrichedCandle, EnrichedCandle>(
+            enriched =>
             {
-                insertionOrder.Enqueue(candle.Close);
+                insertionOrder.Enqueue(enriched.Candle.Close);
 
-                // Binary-search insert to maintain sorted order — O(n) due to list shift,
-                // but avoids the O(n log n) full sort that was here before.
-                var insertAt = sorted.BinarySearch(candle.Close);
-                sorted.Insert(insertAt >= 0 ? insertAt : ~insertAt, candle.Close);
+                var insertAt = sorted.BinarySearch(enriched.Candle.Close);
+                sorted.Insert(insertAt >= 0 ? insertAt : ~insertAt, enriched.Candle.Close);
 
                 if (insertionOrder.Count > period)
                 {
@@ -50,21 +48,17 @@ public static class MovingMedian
                 {
                     var mid = period / 2;
 
-                    var median = period % 2 == 0
+                    enriched.Indicators[name] = period % 2 == 0
                         ? (sorted[mid - 1] + sorted[mid]) / 2m
                         : sorted[mid];
-
-                    await target.SendAsync((candle.Timestamp, median), cancellationToken);
                 }
+
+                return enriched;
             },
             new ExecutionDataflowBlockOptions
             {
                 CancellationToken = cancellationToken,
                 MaxDegreeOfParallelism = 1,
             });
-
-        _ = DataflowHelpers.PropagateCompletionAsync(block, target);
-
-        return block;
     }
 }

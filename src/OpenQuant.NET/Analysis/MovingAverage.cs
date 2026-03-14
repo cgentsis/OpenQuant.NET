@@ -4,22 +4,26 @@ using OpenQuant.Models;
 namespace OpenQuant.Analysis;
 
 /// <summary>
-/// Provides moving average calculations as TPL Dataflow blocks.
+/// Provides moving average calculations as TPL Dataflow <see cref="TransformBlock{TInput,TOutput}"/> stages.
+/// Each factory returns a block that enriches an <see cref="EnrichedCandle"/> with the computed indicator
+/// value and passes it downstream. Blocks can be chained via
+/// <see cref="DataflowBlock.LinkTo{TOutput}(ISourceBlock{TOutput},ITargetBlock{TOutput},DataflowLinkOptions)"/>
+/// with <c>PropagateCompletion = true</c>.
 /// </summary>
 public static class MovingAverage
 {
     /// <summary>
-    /// Creates an <see cref="ActionBlock{Candle}"/> that computes the simple moving average (SMA)
-    /// of closing prices over the specified period and forwards each result to <paramref name="target"/>.
+    /// Creates a <see cref="TransformBlock{EnrichedCandle, EnrichedCandle}"/> that computes the
+    /// simple moving average (SMA) of closing prices over the specified period.
     /// </summary>
+    /// <param name="name">The key under which the value is stored in <see cref="EnrichedCandle.Indicators"/>.</param>
     /// <param name="period">The number of data points to average.</param>
-    /// <param name="target">The target block that receives computed SMA values.</param>
     /// <param name="cancellationToken">Optional cancellation token.</param>
-    /// <returns>An <see cref="ActionBlock{Candle}"/> to which candles should be posted in chronological order.</returns>
+    /// <returns>A transform block to use as a pipeline stage.</returns>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when period is less than 1.</exception>
-    public static ActionBlock<Candle> SMAActionBlockFactory(
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> SMA(
+        string name,
         int period,
-        ITargetBlock<(DateTimeOffset Timestamp, decimal Value)> target,
         CancellationToken cancellationToken = default)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(period, 1);
@@ -27,11 +31,11 @@ public static class MovingAverage
         var window = new Queue<decimal>(period);
         var sum = 0m;
 
-        var block = new ActionBlock<Candle>(
-            async candle =>
+        return new TransformBlock<EnrichedCandle, EnrichedCandle>(
+            enriched =>
             {
-                sum += candle.Close;
-                window.Enqueue(candle.Close);
+                sum += enriched.Candle.Close;
+                window.Enqueue(enriched.Candle.Close);
 
                 if (window.Count > period)
                 {
@@ -40,34 +44,32 @@ public static class MovingAverage
 
                 if (window.Count == period)
                 {
-                    await target.SendAsync((candle.Timestamp, sum / period), cancellationToken);
+                    enriched.Indicators[name] = sum / period;
                 }
+
+                return enriched;
             },
             new ExecutionDataflowBlockOptions
             {
                 CancellationToken = cancellationToken,
                 MaxDegreeOfParallelism = 1,
             });
-
-        _ = DataflowHelpers.PropagateCompletionAsync(block, target);
-
-        return block;
     }
 
     /// <summary>
-    /// Creates an <see cref="ActionBlock{Candle}"/> that computes the exponential moving average (EMA)
-    /// of closing prices over the specified period and forwards each result to <paramref name="target"/>.
+    /// Creates a <see cref="TransformBlock{EnrichedCandle, EnrichedCandle}"/> that computes the
+    /// exponential moving average (EMA) of closing prices over the specified period.
     /// The first value emitted is the SMA of the initial <paramref name="period"/> data points;
     /// subsequent values use the smoothing factor <c>k = 2 / (period + 1)</c>.
     /// </summary>
+    /// <param name="name">The key under which the value is stored in <see cref="EnrichedCandle.Indicators"/>.</param>
     /// <param name="period">The number of data points used for the initial SMA and smoothing factor.</param>
-    /// <param name="target">The target block that receives computed EMA values.</param>
     /// <param name="cancellationToken">Optional cancellation token.</param>
-    /// <returns>An <see cref="ActionBlock{Candle}"/> to which candles should be posted in chronological order.</returns>
+    /// <returns>A transform block to use as a pipeline stage.</returns>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when period is less than 1.</exception>
-    public static ActionBlock<Candle> EMAActionBlockFactory(
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> EMA(
+        string name,
         int period,
-        ITargetBlock<(DateTimeOffset Timestamp, decimal Value)> target,
         CancellationToken cancellationToken = default)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(period, 1);
@@ -77,52 +79,50 @@ public static class MovingAverage
         var ema = 0m;
         var k = 2m / (period + 1);
 
-        var block = new ActionBlock<Candle>(
-            async candle =>
+        return new TransformBlock<EnrichedCandle, EnrichedCandle>(
+            enriched =>
             {
                 count++;
 
                 if (count <= period)
                 {
-                    sum += candle.Close;
+                    sum += enriched.Candle.Close;
 
                     if (count == period)
                     {
                         ema = sum / period;
-                        await target.SendAsync((candle.Timestamp, ema), cancellationToken);
+                        enriched.Indicators[name] = ema;
                     }
                 }
                 else
                 {
-                    ema = (candle.Close * k) + (ema * (1 - k));
-                    await target.SendAsync((candle.Timestamp, ema), cancellationToken);
+                    ema = (enriched.Candle.Close * k) + (ema * (1 - k));
+                    enriched.Indicators[name] = ema;
                 }
+
+                return enriched;
             },
             new ExecutionDataflowBlockOptions
             {
                 CancellationToken = cancellationToken,
                 MaxDegreeOfParallelism = 1,
             });
-
-        _ = DataflowHelpers.PropagateCompletionAsync(block, target);
-
-        return block;
     }
 
     /// <summary>
-    /// Creates an <see cref="ActionBlock{Candle}"/> that computes the weighted moving average (WMA)
-    /// of closing prices over the specified period and forwards each result to <paramref name="target"/>.
-    /// Weights increase linearly: the oldest value in the window receives weight 1, the newest receives
-    /// weight equal to <paramref name="period"/>.
+    /// Creates a <see cref="TransformBlock{EnrichedCandle, EnrichedCandle}"/> that computes the
+    /// weighted moving average (WMA) of closing prices over the specified period.
+    /// Weights increase linearly: the oldest value in the window receives weight 1, the newest
+    /// receives weight equal to <paramref name="period"/>.
     /// </summary>
+    /// <param name="name">The key under which the value is stored in <see cref="EnrichedCandle.Indicators"/>.</param>
     /// <param name="period">The number of data points in the window.</param>
-    /// <param name="target">The target block that receives computed WMA values.</param>
     /// <param name="cancellationToken">Optional cancellation token.</param>
-    /// <returns>An <see cref="ActionBlock{Candle}"/> to which candles should be posted in chronological order.</returns>
+    /// <returns>A transform block to use as a pipeline stage.</returns>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when period is less than 1.</exception>
-    public static ActionBlock<Candle> WMAActionBlockFactory(
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> WMA(
+        string name,
         int period,
-        ITargetBlock<(DateTimeOffset Timestamp, decimal Value)> target,
         CancellationToken cancellationToken = default)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(period, 1);
@@ -130,10 +130,10 @@ public static class MovingAverage
         var window = new Queue<decimal>(period);
         var divisor = period * (period + 1) / 2m;
 
-        var block = new ActionBlock<Candle>(
-            async candle =>
+        return new TransformBlock<EnrichedCandle, EnrichedCandle>(
+            enriched =>
             {
-                window.Enqueue(candle.Close);
+                window.Enqueue(enriched.Candle.Close);
 
                 if (window.Count > period)
                 {
@@ -151,34 +151,32 @@ public static class MovingAverage
                         weight++;
                     }
 
-                    await target.SendAsync((candle.Timestamp, weightedSum / divisor), cancellationToken);
+                    enriched.Indicators[name] = weightedSum / divisor;
                 }
+
+                return enriched;
             },
             new ExecutionDataflowBlockOptions
             {
                 CancellationToken = cancellationToken,
                 MaxDegreeOfParallelism = 1,
             });
-
-        _ = DataflowHelpers.PropagateCompletionAsync(block, target);
-
-        return block;
     }
 
     /// <summary>
-    /// Creates an <see cref="ActionBlock{Candle}"/> that computes the Hull moving average (HMA)
-    /// of closing prices over the specified period and forwards each result to <paramref name="target"/>.
+    /// Creates a <see cref="TransformBlock{EnrichedCandle, EnrichedCandle}"/> that computes the
+    /// Hull moving average (HMA) of closing prices over the specified period.
     /// HMA is calculated as <c>WMA(√n)</c> of <c>2 × WMA(n/2) − WMA(n)</c>, which reduces lag
     /// while maintaining smoothness.
     /// </summary>
+    /// <param name="name">The key under which the value is stored in <see cref="EnrichedCandle.Indicators"/>.</param>
     /// <param name="period">The number of data points for the full WMA window. Must be at least 2.</param>
-    /// <param name="target">The target block that receives computed HMA values.</param>
     /// <param name="cancellationToken">Optional cancellation token.</param>
-    /// <returns>An <see cref="ActionBlock{Candle}"/> to which candles should be posted in chronological order.</returns>
+    /// <returns>A transform block to use as a pipeline stage.</returns>
     /// <exception cref="ArgumentOutOfRangeException">Thrown when period is less than 2.</exception>
-    public static ActionBlock<Candle> HMAActionBlockFactory(
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> HMA(
+        string name,
         int period,
-        ITargetBlock<(DateTimeOffset Timestamp, decimal Value)> target,
         CancellationToken cancellationToken = default)
     {
         ArgumentOutOfRangeException.ThrowIfLessThan(period, 2);
@@ -186,7 +184,6 @@ public static class MovingAverage
         var halfPeriod = period / 2;
         var sqrtPeriod = Math.Max(1, (int)Math.Round(Math.Sqrt(period)));
 
-        // Circular buffers to avoid per-candle allocations.
         var priceBuffer = new decimal[period];
         var priceIndex = 0;
         var priceCount = 0;
@@ -195,16 +192,15 @@ public static class MovingAverage
         var diffIndex = 0;
         var diffCount = 0;
 
-        var block = new ActionBlock<Candle>(
-            async candle =>
+        return new TransformBlock<EnrichedCandle, EnrichedCandle>(
+            enriched =>
             {
-                priceBuffer[priceIndex] = candle.Close;
+                priceBuffer[priceIndex] = enriched.Candle.Close;
                 priceIndex = (priceIndex + 1) % period;
                 priceCount = Math.Min(priceCount + 1, period);
 
                 if (priceCount == period)
                 {
-                    // Oldest element is at priceIndex (it just wrapped).
                     var wmaFull = ComputeWMACircular(priceBuffer, priceIndex, period);
                     var wmaHalf = ComputeWMACircular(priceBuffer, (priceIndex + period - halfPeriod) % period, halfPeriod);
                     var diff = (2m * wmaHalf) - wmaFull;
@@ -216,19 +212,17 @@ public static class MovingAverage
                     if (diffCount == sqrtPeriod)
                     {
                         var hma = ComputeWMACircular(diffBuffer, diffIndex, sqrtPeriod);
-                        await target.SendAsync((candle.Timestamp, hma), cancellationToken);
+                        enriched.Indicators[name] = hma;
                     }
                 }
+
+                return enriched;
             },
             new ExecutionDataflowBlockOptions
             {
                 CancellationToken = cancellationToken,
                 MaxDegreeOfParallelism = 1,
             });
-
-        _ = DataflowHelpers.PropagateCompletionAsync(block, target);
-
-        return block;
     }
 
     private static decimal ComputeWMACircular(decimal[] buffer, int startIndex, int count)

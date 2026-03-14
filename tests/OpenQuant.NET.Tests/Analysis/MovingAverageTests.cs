@@ -7,52 +7,50 @@ namespace OpenQuant.Tests.Analysis;
 public class MovingAverageTests
 {
     [Fact]
-    public async Task Simple_WithValidPeriod_ReturnsCorrectAverages()
+    public async Task SMA_WithValidPeriod_ReturnsCorrectAverages()
     {
-        var output = new BufferBlock<(DateTimeOffset Timestamp, decimal Value)>();
-        var block = MovingAverage.SMAActionBlockFactory(3, output);
+        var results = new List<EnrichedCandle>();
+        var sma = MovingAverage.SMA("SMA", 3);
+        var sink = CreateSink(results);
+        sma.LinkTo(sink, new DataflowLinkOptions { PropagateCompletion = true });
 
-        await block.SendAsync(MakeCandle(10m, 0));
-        await block.SendAsync(MakeCandle(20m, 1));
-        await block.SendAsync(MakeCandle(30m, 2));
-        await block.SendAsync(MakeCandle(40m, 3));
-        await block.SendAsync(MakeCandle(50m, 4));
-        block.Complete();
-        await block.Completion;
+        await sma.SendAsync(Enrich(10m, 0));
+        await sma.SendAsync(Enrich(20m, 1));
+        await sma.SendAsync(Enrich(30m, 2));
+        await sma.SendAsync(Enrich(40m, 3));
+        await sma.SendAsync(Enrich(50m, 4));
+        sma.Complete();
+        await sink.Completion;
 
-        var results = new List<(DateTimeOffset Timestamp, decimal Value)>();
-        while (output.TryReceive(out var item))
-        {
-            results.Add(item);
-        }
-
-        Assert.Equal(3, results.Count);
-        Assert.Equal(20m, results[0].Value);  // (10+20+30)/3
-        Assert.Equal(30m, results[1].Value);  // (20+30+40)/3
-        Assert.Equal(40m, results[2].Value);  // (30+40+50)/3
+        Assert.Equal(5, results.Count);
+        Assert.False(results[0].Indicators.ContainsKey("SMA"));
+        Assert.False(results[1].Indicators.ContainsKey("SMA"));
+        Assert.Equal(20m, results[2].Indicators["SMA"]);   // (10+20+30)/3
+        Assert.Equal(30m, results[3].Indicators["SMA"]);   // (20+30+40)/3
+        Assert.Equal(40m, results[4].Indicators["SMA"]);   // (30+40+50)/3
     }
 
     [Fact]
-    public async Task Simple_WithPeriodLargerThanData_ProducesNoOutput()
+    public async Task SMA_WithPeriodLargerThanData_ProducesNoValues()
     {
-        var output = new BufferBlock<(DateTimeOffset Timestamp, decimal Value)>();
-        var block = MovingAverage.SMAActionBlockFactory(5, output);
+        var results = new List<EnrichedCandle>();
+        var sma = MovingAverage.SMA("SMA", 5);
+        var sink = CreateSink(results);
+        sma.LinkTo(sink, new DataflowLinkOptions { PropagateCompletion = true });
 
-        await block.SendAsync(MakeCandle(10m));
-        await block.SendAsync(MakeCandle(20m));
-        block.Complete();
-        await block.Completion;
+        await sma.SendAsync(Enrich(10m));
+        await sma.SendAsync(Enrich(20m));
+        sma.Complete();
+        await sink.Completion;
 
-        Assert.False(output.TryReceive(out _));
+        Assert.All(results, r => Assert.Empty(r.Indicators));
     }
 
     [Fact]
-    public void Simple_WithPeriodLessThanOne_Throws()
+    public void SMA_WithPeriodLessThanOne_Throws()
     {
-        var output = new BufferBlock<(DateTimeOffset Timestamp, decimal Value)>();
-
         Assert.Throws<ArgumentOutOfRangeException>(() =>
-            MovingAverage.SMAActionBlockFactory(0, output));
+            MovingAverage.SMA("SMA", 0));
     }
 
     [Fact]
@@ -62,46 +60,45 @@ public class MovingAverageTests
         // SMA seed = (10+20+30)/3 = 20
         // EMA(40) = 40*0.5 + 20*0.5 = 30
         // EMA(50) = 50*0.5 + 30*0.5 = 40
-        var output = new BufferBlock<(DateTimeOffset Timestamp, decimal Value)>();
-        var block = MovingAverage.EMAActionBlockFactory(3, output);
+        var results = new List<EnrichedCandle>();
+        var ema = MovingAverage.EMA("EMA", 3);
+        var sink = CreateSink(results);
+        ema.LinkTo(sink, new DataflowLinkOptions { PropagateCompletion = true });
 
-        await block.SendAsync(MakeCandle(10m, 0));
-        await block.SendAsync(MakeCandle(20m, 1));
-        await block.SendAsync(MakeCandle(30m, 2));
-        await block.SendAsync(MakeCandle(40m, 3));
-        await block.SendAsync(MakeCandle(50m, 4));
-        block.Complete();
-        await block.Completion;
+        await ema.SendAsync(Enrich(10m, 0));
+        await ema.SendAsync(Enrich(20m, 1));
+        await ema.SendAsync(Enrich(30m, 2));
+        await ema.SendAsync(Enrich(40m, 3));
+        await ema.SendAsync(Enrich(50m, 4));
+        ema.Complete();
+        await sink.Completion;
 
-        var results = Drain(output);
-
-        Assert.Equal(3, results.Count);
-        Assert.Equal(20m, results[0].Value);
-        Assert.Equal(30m, results[1].Value);
-        Assert.Equal(40m, results[2].Value);
+        Assert.Equal(20m, results[2].Indicators["EMA"]);
+        Assert.Equal(30m, results[3].Indicators["EMA"]);
+        Assert.Equal(40m, results[4].Indicators["EMA"]);
     }
 
     [Fact]
-    public async Task EMA_WithPeriodLargerThanData_ProducesNoOutput()
+    public async Task EMA_WithPeriodLargerThanData_ProducesNoValues()
     {
-        var output = new BufferBlock<(DateTimeOffset Timestamp, decimal Value)>();
-        var block = MovingAverage.EMAActionBlockFactory(5, output);
+        var results = new List<EnrichedCandle>();
+        var ema = MovingAverage.EMA("EMA", 5);
+        var sink = CreateSink(results);
+        ema.LinkTo(sink, new DataflowLinkOptions { PropagateCompletion = true });
 
-        await block.SendAsync(MakeCandle(10m));
-        await block.SendAsync(MakeCandle(20m));
-        block.Complete();
-        await block.Completion;
+        await ema.SendAsync(Enrich(10m));
+        await ema.SendAsync(Enrich(20m));
+        ema.Complete();
+        await sink.Completion;
 
-        Assert.False(output.TryReceive(out _));
+        Assert.All(results, r => Assert.Empty(r.Indicators));
     }
 
     [Fact]
     public void EMA_WithPeriodLessThanOne_Throws()
     {
-        var output = new BufferBlock<(DateTimeOffset Timestamp, decimal Value)>();
-
         Assert.Throws<ArgumentOutOfRangeException>(() =>
-            MovingAverage.EMAActionBlockFactory(0, output));
+            MovingAverage.EMA("EMA", 0));
     }
 
     [Fact]
@@ -111,46 +108,45 @@ public class MovingAverageTests
         // (6*1+12*2+18*3)/6 = 84/6 = 14
         // (12*1+18*2+24*3)/6 = 120/6 = 20
         // (18*1+24*2+30*3)/6 = 156/6 = 26
-        var output = new BufferBlock<(DateTimeOffset Timestamp, decimal Value)>();
-        var block = MovingAverage.WMAActionBlockFactory(3, output);
+        var results = new List<EnrichedCandle>();
+        var wma = MovingAverage.WMA("WMA", 3);
+        var sink = CreateSink(results);
+        wma.LinkTo(sink, new DataflowLinkOptions { PropagateCompletion = true });
 
-        await block.SendAsync(MakeCandle(6m, 0));
-        await block.SendAsync(MakeCandle(12m, 1));
-        await block.SendAsync(MakeCandle(18m, 2));
-        await block.SendAsync(MakeCandle(24m, 3));
-        await block.SendAsync(MakeCandle(30m, 4));
-        block.Complete();
-        await block.Completion;
+        await wma.SendAsync(Enrich(6m, 0));
+        await wma.SendAsync(Enrich(12m, 1));
+        await wma.SendAsync(Enrich(18m, 2));
+        await wma.SendAsync(Enrich(24m, 3));
+        await wma.SendAsync(Enrich(30m, 4));
+        wma.Complete();
+        await sink.Completion;
 
-        var results = Drain(output);
-
-        Assert.Equal(3, results.Count);
-        Assert.Equal(14m, results[0].Value);
-        Assert.Equal(20m, results[1].Value);
-        Assert.Equal(26m, results[2].Value);
+        Assert.Equal(14m, results[2].Indicators["WMA"]);
+        Assert.Equal(20m, results[3].Indicators["WMA"]);
+        Assert.Equal(26m, results[4].Indicators["WMA"]);
     }
 
     [Fact]
-    public async Task WMA_WithPeriodLargerThanData_ProducesNoOutput()
+    public async Task WMA_WithPeriodLargerThanData_ProducesNoValues()
     {
-        var output = new BufferBlock<(DateTimeOffset Timestamp, decimal Value)>();
-        var block = MovingAverage.WMAActionBlockFactory(5, output);
+        var results = new List<EnrichedCandle>();
+        var wma = MovingAverage.WMA("WMA", 5);
+        var sink = CreateSink(results);
+        wma.LinkTo(sink, new DataflowLinkOptions { PropagateCompletion = true });
 
-        await block.SendAsync(MakeCandle(10m));
-        await block.SendAsync(MakeCandle(20m));
-        block.Complete();
-        await block.Completion;
+        await wma.SendAsync(Enrich(10m));
+        await wma.SendAsync(Enrich(20m));
+        wma.Complete();
+        await sink.Completion;
 
-        Assert.False(output.TryReceive(out _));
+        Assert.All(results, r => Assert.Empty(r.Indicators));
     }
 
     [Fact]
     public void WMA_WithPeriodLessThanOne_Throws()
     {
-        var output = new BufferBlock<(DateTimeOffset Timestamp, decimal Value)>();
-
         Assert.Throws<ArgumentOutOfRangeException>(() =>
-            MovingAverage.WMAActionBlockFactory(0, output));
+            MovingAverage.WMA("WMA", 0));
     }
 
     [Fact]
@@ -158,68 +154,93 @@ public class MovingAverageTests
     {
         // Period 4: halfPeriod=2, sqrtPeriod=2
         // Linear data produces HMA that tracks perfectly.
-        // First HMA output at index 4 (5th candle): 50
-        // Then: 60, 70
-        var output = new BufferBlock<(DateTimeOffset Timestamp, decimal Value)>();
-        var block = MovingAverage.HMAActionBlockFactory(4, output);
+        var results = new List<EnrichedCandle>();
+        var hma = MovingAverage.HMA("HMA", 4);
+        var sink = CreateSink(results);
+        hma.LinkTo(sink, new DataflowLinkOptions { PropagateCompletion = true });
 
-        await block.SendAsync(MakeCandle(10m, 0));
-        await block.SendAsync(MakeCandle(20m, 1));
-        await block.SendAsync(MakeCandle(30m, 2));
-        await block.SendAsync(MakeCandle(40m, 3));
-        await block.SendAsync(MakeCandle(50m, 4));
-        await block.SendAsync(MakeCandle(60m, 5));
-        await block.SendAsync(MakeCandle(70m, 6));
-        block.Complete();
-        await block.Completion;
+        await hma.SendAsync(Enrich(10m, 0));
+        await hma.SendAsync(Enrich(20m, 1));
+        await hma.SendAsync(Enrich(30m, 2));
+        await hma.SendAsync(Enrich(40m, 3));
+        await hma.SendAsync(Enrich(50m, 4));
+        await hma.SendAsync(Enrich(60m, 5));
+        await hma.SendAsync(Enrich(70m, 6));
+        hma.Complete();
+        await sink.Completion;
 
-        var results = Drain(output);
+        var hmaResults = results.Where(r => r.Indicators.ContainsKey("HMA")).ToList();
 
-        Assert.Equal(3, results.Count);
-        Assert.Equal(50m, Math.Round(results[0].Value, 20));
-        Assert.Equal(60m, Math.Round(results[1].Value, 20));
-        Assert.Equal(70m, Math.Round(results[2].Value, 20));
+        Assert.Equal(3, hmaResults.Count);
+        Assert.Equal(50m, Math.Round(hmaResults[0].Indicators["HMA"], 20));
+        Assert.Equal(60m, Math.Round(hmaResults[1].Indicators["HMA"], 20));
+        Assert.Equal(70m, Math.Round(hmaResults[2].Indicators["HMA"], 20));
     }
 
     [Fact]
-    public async Task HMA_WithInsufficientData_ProducesNoOutput()
+    public async Task HMA_WithInsufficientData_ProducesNoValues()
     {
-        // Period 4 requires 4 + sqrt(4) - 1 = 5 candles minimum
-        var output = new BufferBlock<(DateTimeOffset Timestamp, decimal Value)>();
-        var block = MovingAverage.HMAActionBlockFactory(4, output);
+        var results = new List<EnrichedCandle>();
+        var hma = MovingAverage.HMA("HMA", 4);
+        var sink = CreateSink(results);
+        hma.LinkTo(sink, new DataflowLinkOptions { PropagateCompletion = true });
 
-        await block.SendAsync(MakeCandle(10m, 0));
-        await block.SendAsync(MakeCandle(20m, 1));
-        await block.SendAsync(MakeCandle(30m, 2));
-        await block.SendAsync(MakeCandle(40m, 3));
-        block.Complete();
-        await block.Completion;
+        await hma.SendAsync(Enrich(10m, 0));
+        await hma.SendAsync(Enrich(20m, 1));
+        await hma.SendAsync(Enrich(30m, 2));
+        await hma.SendAsync(Enrich(40m, 3));
+        hma.Complete();
+        await sink.Completion;
 
-        Assert.False(output.TryReceive(out _));
+        Assert.All(results, r => Assert.Empty(r.Indicators));
     }
 
     [Fact]
     public void HMA_WithPeriodLessThanTwo_Throws()
     {
-        var output = new BufferBlock<(DateTimeOffset Timestamp, decimal Value)>();
-
         Assert.Throws<ArgumentOutOfRangeException>(() =>
-            MovingAverage.HMAActionBlockFactory(1, output));
+            MovingAverage.HMA("HMA", 1));
     }
 
-    private static List<(DateTimeOffset Timestamp, decimal Value)> Drain(
-        BufferBlock<(DateTimeOffset Timestamp, decimal Value)> buffer)
+    [Fact]
+    public async Task Pipeline_ChainedBlocks_EnrichesCandles()
     {
-        var results = new List<(DateTimeOffset Timestamp, decimal Value)>();
-        while (buffer.TryReceive(out var item))
-        {
-            results.Add(item);
-        }
+        // Chain SMA(3) → EMA(3) via LinkTo
+        var results = new List<EnrichedCandle>();
+        var sma = MovingAverage.SMA("SMA3", 3);
+        var ema = MovingAverage.EMA("EMA3", 3);
+        var sink = CreateSink(results);
 
-        return results;
+        sma.LinkTo(ema, new DataflowLinkOptions { PropagateCompletion = true });
+        ema.LinkTo(sink, new DataflowLinkOptions { PropagateCompletion = true });
+
+        await sma.SendAsync(Enrich(10m, 0));
+        await sma.SendAsync(Enrich(20m, 1));
+        await sma.SendAsync(Enrich(30m, 2));
+        await sma.SendAsync(Enrich(25m, 3));
+        await sma.SendAsync(Enrich(35m, 4));
+        sma.Complete();
+        await sink.Completion;
+
+        Assert.Equal(5, results.Count);
+
+        // SMA3 starts at index 2, EMA3 starts at index 2
+        Assert.Equal(20m, results[2].Indicators["SMA3"]);
+        Assert.Equal(20m, results[2].Indicators["EMA3"]);
+
+        // k = 0.5; EMA(25) = 25*0.5 + 20*0.5 = 22.5
+        Assert.Equal(25m, results[3].Indicators["SMA3"]);
+        Assert.Equal(22.5m, results[3].Indicators["EMA3"]);
+
+        // EMA(35) = 35*0.5 + 22.5*0.5 = 28.75
+        Assert.Equal(30m, results[4].Indicators["SMA3"]);
+        Assert.Equal(28.75m, results[4].Indicators["EMA3"]);
     }
 
-    private static Candle MakeCandle(decimal close, int dayOffset = 0) => new()
+    private static ActionBlock<EnrichedCandle> CreateSink(List<EnrichedCandle> results) =>
+        new(item => results.Add(item));
+
+    private static EnrichedCandle Enrich(decimal close, int dayOffset = 0) => new(new Candle
     {
         Timestamp = new DateTimeOffset(2025, 1, 1, 0, 0, 0, TimeSpan.Zero).AddDays(dayOffset),
         Open = close,
@@ -227,5 +248,5 @@ public class MovingAverageTests
         Low = close,
         Close = close,
         Volume = 1000,
-    };
+    });
 }
