@@ -152,7 +152,8 @@ OpenQuant.NET/
 ├── src/
 │   └── OpenQuant.NET/                        # Core library
 │       ├── Models/
-│       │   └── Candle.cs                     # OHLCV price record
+│       │   ├── Candle.cs                     # OHLCV price record
+│       │   └── EnrichedCandle.cs             # Candle enriched with indicator values
 │       ├── Analysis/
 │       │   ├── MovingAverage.cs              # SMA, EMA, WMA, HMA via TPL Dataflow
 │       │   └── MovingMedian.cs               # Moving Median via TPL Dataflow
@@ -196,6 +197,13 @@ Both are configured in `Directory.Build.props` with `TreatWarningsAsErrors=true`
 | `Low` | `decimal` | Lowest price |
 | `Close` | `decimal` | Closing price |
 | `Volume` | `long` | Trading volume |
+
+### `EnrichedCandle`
+
+| Property | Type | Description |
+|---|---|---|
+| `Candle` | `Candle` | The original OHLCV candle |
+| `Indicators` | `Dictionary<string, decimal>` | Computed indicator values keyed by name |
 
 ### `IMarketDataProvider`
 
