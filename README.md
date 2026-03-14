@@ -9,7 +9,7 @@ OpenQuant.NET is an open‑source .NET library providing unified financial data 
 - **Unified data model** – `Candle` record for OHLCV (Open, High, Low, Close, Volume) price data
 - **Provider abstraction** – `IMarketDataProvider` interface to plug in any market‑data source
 - **Yahoo Finance provider** – Built‑in provider for retrieving historical and latest candle data
-- **Technical analysis** – TPL Dataflow‑based indicators (SMA, with more planned)
+- **Technical analysis** – TPL Dataflow‑based indicators (SMA, EMA, WMA, HMA, Moving Median)
 - **Code quality** – Enforced via StyleCop Analyzers and SonarAnalyzer on every build
 
 ## Getting Started
@@ -65,9 +65,9 @@ var latest = await provider.GetLatestCandleAsync("MSFT");
 Console.WriteLine($"MSFT latest close: {latest?.Close}");
 ```
 
-### Computing a Simple Moving Average (SMA)
+### Computing Technical Indicators
 
-The SMA indicator is built on [TPL Dataflow](https://learn.microsoft.com/en-us/dotnet/standard/parallel-programming/dataflow-task-parallel-library) `ActionBlock<T>`, making it composable in streaming pipelines.
+All indicators are built on [TPL Dataflow](https://learn.microsoft.com/en-us/dotnet/standard/parallel-programming/dataflow-task-parallel-library) `ActionBlock<T>`, making them composable in streaming pipelines.
 
 ```csharp
 using System.Threading.Tasks.Dataflow;
@@ -91,6 +91,22 @@ while (output.TryReceive(out var point))
 {
     Console.WriteLine($"{point.Timestamp:yyyy-MM-dd}  SMA(20): {point.Value:F2}");
 }
+```
+
+The same pattern applies to all indicators — swap the factory method:
+
+```csharp
+// Exponential Moving Average
+var ema = MovingAverage.EMAActionBlockFactory(period: 12, target: output);
+
+// Weighted Moving Average
+var wma = MovingAverage.WMAActionBlockFactory(period: 10, target: output);
+
+// Hull Moving Average (period must be ≥ 2)
+var hma = MovingAverage.HMAActionBlockFactory(period: 16, target: output);
+
+// Moving Median
+var median = MovingMedian.MedianActionBlockFactory(period: 5, target: output);
 ```
 
 ### Implementing a Custom Data Provider
@@ -129,7 +145,8 @@ OpenQuant.NET/
 │       ├── Models/
 │       │   └── Candle.cs                     # OHLCV price record
 │       ├── Analysis/
-│       │   └── MovingAverage.cs              # SMA via TPL Dataflow ActionBlock
+│       │   ├── MovingAverage.cs              # SMA, EMA, WMA, HMA via TPL Dataflow
+│       │   └── MovingMedian.cs               # Moving Median via TPL Dataflow
 │       ├── Providers/
 │       │   └── YahooFinance/
 │       │       ├── YahooFinanceProvider.cs   # Yahoo Finance v8 chart API client
@@ -183,7 +200,16 @@ Both are configured in `Directory.Build.props` with `TreatWarningsAsErrors=true`
 
 | Method | Returns | Description |
 |---|---|---|
-| `SMAActionBlockFactory(period, target)` | `ActionBlock<Candle>` | Creates a Dataflow block computing the simple moving average |
+| `SMAActionBlockFactory(period, target)` | `ActionBlock<Candle>` | Simple moving average over `period` closing prices |
+| `EMAActionBlockFactory(period, target)` | `ActionBlock<Candle>` | Exponential moving average; seeds with SMA, then applies smoothing factor `2/(period+1)` |
+| `WMAActionBlockFactory(period, target)` | `ActionBlock<Candle>` | Weighted moving average with linearly increasing weights (oldest=1, newest=period) |
+| `HMAActionBlockFactory(period, target)` | `ActionBlock<Candle>` | Hull moving average — `WMA(√n)` of `2×WMA(n/2) − WMA(n)` — period must be ≥ 2 |
+
+### `MovingMedian`
+
+| Method | Returns | Description |
+|---|---|---|
+| `MedianActionBlockFactory(period, target)` | `ActionBlock<Candle>` | Moving median of closing prices; averages the two middle values for even periods |
 
 ### `YahooFinanceProvider`
 
