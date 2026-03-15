@@ -62,6 +62,42 @@ public sealed class YahooFinanceProvider : IMarketDataProvider
     }
 
     /// <summary>
+    /// Retrieves the most recent <paramref name="count"/> trading-day candles up to and including
+    /// the specified <paramref name="asOf"/> date from Yahoo Finance. Fetches extra calendar days
+    /// to account for weekends and holidays, then trims to the requested count.
+    /// </summary>
+    /// <param name="symbol">The ticker symbol (e.g. <c>"AAPL"</c>).</param>
+    /// <param name="asOf">The reference date (inclusive upper bound).</param>
+    /// <param name="count">The number of trading-day candles to retrieve.</param>
+    /// <param name="cancellationToken">Optional cancellation token.</param>
+    /// <returns>A read-only list of up to <paramref name="count"/> candles ordered by timestamp.</returns>
+    /// <exception cref="ArgumentException">Thrown when <paramref name="symbol"/> is null or whitespace.</exception>
+    /// <exception cref="ArgumentOutOfRangeException">Thrown when <paramref name="count"/> is less than 1.</exception>
+    /// <exception cref="HttpRequestException">Thrown when the API returns an error or null response.</exception>
+    public async Task<IReadOnlyList<Candle>> GetCandlesAsync(
+        string symbol,
+        DateTimeOffset asOf,
+        int count,
+        CancellationToken cancellationToken = default)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(symbol);
+        ArgumentOutOfRangeException.ThrowIfLessThan(count, 1);
+
+        // Fetch ~1.5× calendar days to account for weekends/holidays (≈5 trading days per 7 calendar days).
+        var calendarDays = (int)Math.Ceiling(count * 1.5) + 10;
+        var from = asOf.AddDays(-calendarDays);
+
+        var candles = await GetHistoricalCandlesAsync(symbol, from, asOf, cancellationToken);
+
+        if (candles.Count <= count)
+        {
+            return candles;
+        }
+
+        return candles.Skip(candles.Count - count).ToList().AsReadOnly();
+    }
+
+    /// <summary>
     /// Retrieves the most recent daily candle for the given symbol from Yahoo Finance
     /// using the v8 chart API with a <c>1d</c> range.
     /// </summary>

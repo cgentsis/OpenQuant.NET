@@ -260,6 +260,7 @@ Both are configured in `Directory.Build.props` with `TreatWarningsAsErrors=true`
 |---|---|---|
 | `Name` | `string` | Display name of the provider |
 | `GetHistoricalCandlesAsync(symbol, from, to)` | `Task<IReadOnlyList<Candle>>` | Retrieve candles for a date range |
+| `GetCandlesAsync(symbol, asOf, count)` | `Task<IReadOnlyList<Candle>>` | Retrieve the last N trading-day candles up to a date |
 | `GetLatestCandleAsync(symbol)` | `Task<Candle?>` | Retrieve the most recent candle |
 
 ### `MovingAverage`
