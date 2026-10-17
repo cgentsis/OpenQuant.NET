@@ -34,6 +34,11 @@ public static class MovingAverage
         return new TransformBlock<EnrichedCandle, EnrichedCandle>(
             enriched =>
             {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return enriched;
+                }
+
                 sum += enriched.Candle.Close;
                 window.Enqueue(enriched.Candle.Close);
 
@@ -82,6 +87,11 @@ public static class MovingAverage
         return new TransformBlock<EnrichedCandle, EnrichedCandle>(
             enriched =>
             {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return enriched;
+                }
+
                 count++;
 
                 if (count <= period)
@@ -133,6 +143,11 @@ public static class MovingAverage
         return new TransformBlock<EnrichedCandle, EnrichedCandle>(
             enriched =>
             {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return enriched;
+                }
+
                 window.Enqueue(enriched.Candle.Close);
 
                 if (window.Count > period)
@@ -195,6 +210,11 @@ public static class MovingAverage
         return new TransformBlock<EnrichedCandle, EnrichedCandle>(
             enriched =>
             {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return enriched;
+                }
+
                 priceBuffer[priceIndex] = enriched.Candle.Close;
                 priceIndex = (priceIndex + 1) % period;
                 priceCount = Math.Min(priceCount + 1, period);
@@ -253,6 +273,11 @@ public static class MovingAverage
         return new TransformBlock<EnrichedCandle, EnrichedCandle>(
             enriched =>
             {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return enriched;
+                }
+
                 count++;
 
                 if (count <= period)
@@ -329,6 +354,11 @@ public static class MovingAverage
         return new TransformBlock<EnrichedCandle, EnrichedCandle>(
             enriched =>
             {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return enriched;
+                }
+
                 ema1Count++;
 
                 if (ema1Count <= period)
@@ -424,6 +454,11 @@ public static class MovingAverage
         return new TransformBlock<EnrichedCandle, EnrichedCandle>(
             enriched =>
             {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return enriched;
+                }
+
                 var input = enriched.Candle.Close;
 
                 for (var i = 0; i < 6; i++)
@@ -496,6 +531,11 @@ public static class MovingAverage
         return new TransformBlock<EnrichedCandle, EnrichedCandle>(
             enriched =>
             {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return enriched;
+                }
+
                 innerSum += enriched.Candle.Close;
                 innerWindow.Enqueue(enriched.Candle.Close);
 
@@ -558,6 +598,11 @@ public static class MovingAverage
         return new TransformBlock<EnrichedCandle, EnrichedCandle>(
             enriched =>
             {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return enriched;
+                }
+
                 window.Enqueue(enriched.Candle.Close);
 
                 if (window.Count > period + 1)

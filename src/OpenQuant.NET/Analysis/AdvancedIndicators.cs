@@ -35,6 +35,11 @@ public static class AdvancedIndicators
         return new TransformBlock<EnrichedCandle, EnrichedCandle>(
             enriched =>
             {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return enriched;
+                }
+
                 var c = enriched.Candle;
                 count++;
 
@@ -129,6 +134,11 @@ public static class AdvancedIndicators
         return new TransformBlock<EnrichedCandle, EnrichedCandle>(
             enriched =>
             {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return enriched;
+                }
+
                 var price = (enriched.Candle.High + enriched.Candle.Low) / 2m;
                 prices.Add(price);
 
@@ -168,6 +178,11 @@ public static class AdvancedIndicators
         return new TransformBlock<EnrichedCandle, EnrichedCandle>(
             enriched =>
             {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return enriched;
+                }
+
                 var price = (enriched.Candle.High + enriched.Candle.Low) / 2m;
                 prices.Add(price);
 
@@ -212,6 +227,11 @@ public static class AdvancedIndicators
         return new TransformBlock<EnrichedCandle, EnrichedCandle>(
             enriched =>
             {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return enriched;
+                }
+
                 var price = (enriched.Candle.High + enriched.Candle.Low) / 2m;
                 prices.Add(price);
 
@@ -273,6 +293,11 @@ public static class AdvancedIndicators
         return new TransformBlock<EnrichedCandle, EnrichedCandle>(
             enriched =>
             {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return enriched;
+                }
+
                 var price = (enriched.Candle.High + enriched.Candle.Low) / 2m;
                 prices.Add(price);
 
@@ -326,6 +351,11 @@ public static class AdvancedIndicators
         return new TransformBlock<EnrichedCandle, EnrichedCandle>(
             enriched =>
             {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return enriched;
+                }
+
                 var price = (enriched.Candle.High + enriched.Candle.Low) / 2m;
                 prices.Add(price);
 
@@ -388,6 +418,11 @@ public static class AdvancedIndicators
         return new TransformBlock<EnrichedCandle, EnrichedCandle>(
             enriched =>
             {
+                if (cancellationToken.IsCancellationRequested)
+                {
+                    return enriched;
+                }
+
                 var price = (enriched.Candle.High + enriched.Candle.Low) / 2m;
                 prices.Add(price);
 
