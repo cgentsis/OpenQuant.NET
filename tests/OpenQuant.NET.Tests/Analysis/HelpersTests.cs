@@ -1,6 +1,6 @@
 using System;
-using Xunit;
 using OpenQuant.Analysis;
+using Xunit;
 
 namespace OpenQuant.Tests.Analysis;
 
@@ -18,7 +18,7 @@ public class HelpersTests
         var result = Helpers.ComputeWMACircular(buffer, startIndex, count);
 
         // Assert
-        // WMA calculation: (1*10 + 2*20 + 3*30 + 4*40 + 5*50) / (1+2+3+4+5) 
+        // WMA calculation: (1*10 + 2*20 + 3*30 + 4*40 + 5*50) / (1+2+3+4+5)
         // = (10 + 40 + 90 + 160 + 250) / 15 = 550 / 15 = 36.666...
         Assert.Equal(36.666666666666666666666666667m, result, precision: 28);
     }
@@ -34,7 +34,7 @@ public class HelpersTests
         var result = Helpers.ComputeWMA(buffer, period);
 
         // Assert
-        // WMA calculation: (1*10 + 2*20 + 3*30 + 4*40 + 5*50) / (1+2+3+4+5) 
+        // WMA calculation: (1*10 + 2*20 + 3*30 + 4*40 + 5*50) / (1+2+3+4+5)
         // = (10 + 40 + 90 + 160 + 250) / 15 = 550 / 15 = 36.666...
         Assert.Equal(36.666666666666666666666666667m, result, precision: 28);
     }

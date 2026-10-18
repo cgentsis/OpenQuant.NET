@@ -602,8 +602,6 @@ public static class MovingAverage
             });
     }
 
-
-
 #pragma warning disable SA1202 // Lookback methods are intentionally kept at the end of the class.
 
     // Lookback methods
