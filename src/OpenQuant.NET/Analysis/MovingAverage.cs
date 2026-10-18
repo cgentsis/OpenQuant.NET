@@ -201,8 +201,8 @@ public static class MovingAverage
 
                 if (priceCount == period)
                 {
-                    var wmaFull = ComputeWMACircular(priceBuffer, priceIndex, period);
-                    var wmaHalf = ComputeWMACircular(priceBuffer, (priceIndex + period - halfPeriod) % period, halfPeriod);
+                    var wmaFull = Helpers.ComputeWMACircular(priceBuffer, priceIndex, period);
+                    var wmaHalf = Helpers.ComputeWMACircular(priceBuffer, (priceIndex + period - halfPeriod) % period, halfPeriod);
                     var diff = (2m * wmaHalf) - wmaFull;
 
                     diffBuffer[diffIndex] = diff;
@@ -211,7 +211,7 @@ public static class MovingAverage
 
                     if (diffCount == sqrtPeriod)
                     {
-                        var hma = ComputeWMACircular(diffBuffer, diffIndex, sqrtPeriod);
+                        var hma = Helpers.ComputeWMACircular(diffBuffer, diffIndex, sqrtPeriod);
                         enriched.Indicators[name] = hma;
                     }
                 }
@@ -602,18 +602,7 @@ public static class MovingAverage
             });
     }
 
-    private static decimal ComputeWMACircular(decimal[] buffer, int startIndex, int count)
-    {
-        var weightedSum = 0m;
-        var length = buffer.Length;
 
-        for (var i = 0; i < count; i++)
-        {
-            weightedSum += buffer[(startIndex + i) % length] * (i + 1);
-        }
-
-        return weightedSum / (count * (count + 1) / 2m);
-    }
 
 #pragma warning disable SA1202 // Lookback methods are intentionally kept at the end of the class.
 
