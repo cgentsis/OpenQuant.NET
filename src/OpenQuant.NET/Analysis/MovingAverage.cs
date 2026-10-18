@@ -96,7 +96,7 @@ public static class MovingAverage
                 }
                 else
                 {
-                    ema = (enriched.Candle.Close * k) + (ema * (1 - k));
+                    ema = Helpers.ComputeEMA(ema, enriched.Candle.Close, k);
                     enriched.Indicators[name] = ema;
                 }
 
@@ -266,7 +266,7 @@ public static class MovingAverage
                 }
                 else
                 {
-                    ema = (enriched.Candle.Close * k) + (ema * (1 - k));
+                    ema = Helpers.ComputeEMA(ema, enriched.Candle.Close, k);
                 }
 
                 if (count >= period)
@@ -285,7 +285,7 @@ public static class MovingAverage
                     }
                     else
                     {
-                        emaOfEma = (ema * k) + (emaOfEma * (1 - k));
+                        emaOfEma = Helpers.ComputeEMA(emaOfEma, ema, k);
                         enriched.Indicators[name] = (2m * ema) - emaOfEma;
                     }
                 }
@@ -341,7 +341,7 @@ public static class MovingAverage
                 }
                 else
                 {
-                    ema1 = (enriched.Candle.Close * k) + (ema1 * (1 - k));
+                    ema1 = Helpers.ComputeEMA(ema1, enriched.Candle.Close, k);
                 }
 
                 if (ema1Count >= period)
@@ -358,7 +358,7 @@ public static class MovingAverage
                     }
                     else
                     {
-                        ema2 = (ema1 * k) + (ema2 * (1 - k));
+                        ema2 = Helpers.ComputeEMA(ema2, ema1, k);
                     }
                 }
 
@@ -377,7 +377,7 @@ public static class MovingAverage
                     }
                     else
                     {
-                        ema3 = (ema2 * k) + (ema3 * (1 - k));
+                        ema3 = Helpers.ComputeEMA(ema3, ema2, k);
                         enriched.Indicators[name] = (3m * ema1) - (3m * ema2) + ema3;
                     }
                 }
@@ -446,7 +446,7 @@ public static class MovingAverage
                     }
                     else
                     {
-                        emas[i] = (input * k) + (emas[i] * (1 - k));
+                        emas[i] = Helpers.ComputeEMA(emas[i], input, k);
                     }
 
                     input = emas[i];
