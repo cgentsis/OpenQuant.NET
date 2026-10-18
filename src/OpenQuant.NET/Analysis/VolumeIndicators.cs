@@ -145,7 +145,7 @@ public static class VolumeIndicators
                 }
                 else
                 {
-                    fastEma = (adLine * fastK) + (fastEma * (1 - fastK));
+                    fastEma = Helpers.ComputeEMA(fastEma, adLine, fastK);
                     fastReady = true;
                 }
 
@@ -161,7 +161,7 @@ public static class VolumeIndicators
                 }
                 else
                 {
-                    slowEma = (adLine * slowK) + (slowEma * (1 - slowK));
+                    slowEma = Helpers.ComputeEMA(slowEma, adLine, slowK);
                     slowReady = true;
                 }
 

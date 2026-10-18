@@ -106,7 +106,7 @@ public static class MovingAverage
                 }
                 else
                 {
-                    ema = (enriched.Candle.Close * k) + (ema * (1 - k));
+                    ema = Helpers.ComputeEMA(ema, enriched.Candle.Close, k);
                     enriched.Indicators[name] = ema;
                 }
 
@@ -221,8 +221,8 @@ public static class MovingAverage
 
                 if (priceCount == period)
                 {
-                    var wmaFull = ComputeWMACircular(priceBuffer, priceIndex, period);
-                    var wmaHalf = ComputeWMACircular(priceBuffer, (priceIndex + period - halfPeriod) % period, halfPeriod);
+                    var wmaFull = Helpers.ComputeWMACircular(priceBuffer, priceIndex, period);
+                    var wmaHalf = Helpers.ComputeWMACircular(priceBuffer, (priceIndex + period - halfPeriod) % period, halfPeriod);
                     var diff = (2m * wmaHalf) - wmaFull;
 
                     diffBuffer[diffIndex] = diff;
@@ -231,7 +231,7 @@ public static class MovingAverage
 
                     if (diffCount == sqrtPeriod)
                     {
-                        var hma = ComputeWMACircular(diffBuffer, diffIndex, sqrtPeriod);
+                        var hma = Helpers.ComputeWMACircular(diffBuffer, diffIndex, sqrtPeriod);
                         enriched.Indicators[name] = hma;
                     }
                 }
@@ -291,7 +291,7 @@ public static class MovingAverage
                 }
                 else
                 {
-                    ema = (enriched.Candle.Close * k) + (ema * (1 - k));
+                    ema = Helpers.ComputeEMA(ema, enriched.Candle.Close, k);
                 }
 
                 if (count >= period)
@@ -310,7 +310,7 @@ public static class MovingAverage
                     }
                     else
                     {
-                        emaOfEma = (ema * k) + (emaOfEma * (1 - k));
+                        emaOfEma = Helpers.ComputeEMA(emaOfEma, ema, k);
                         enriched.Indicators[name] = (2m * ema) - emaOfEma;
                     }
                 }
@@ -371,7 +371,7 @@ public static class MovingAverage
                 }
                 else
                 {
-                    ema1 = (enriched.Candle.Close * k) + (ema1 * (1 - k));
+                    ema1 = Helpers.ComputeEMA(ema1, enriched.Candle.Close, k);
                 }
 
                 if (ema1Count >= period)
@@ -388,7 +388,7 @@ public static class MovingAverage
                     }
                     else
                     {
-                        ema2 = (ema1 * k) + (ema2 * (1 - k));
+                        ema2 = Helpers.ComputeEMA(ema2, ema1, k);
                     }
                 }
 
@@ -407,7 +407,7 @@ public static class MovingAverage
                     }
                     else
                     {
-                        ema3 = (ema2 * k) + (ema3 * (1 - k));
+                        ema3 = Helpers.ComputeEMA(ema3, ema2, k);
                         enriched.Indicators[name] = (3m * ema1) - (3m * ema2) + ema3;
                     }
                 }
@@ -481,7 +481,7 @@ public static class MovingAverage
                     }
                     else
                     {
-                        emas[i] = (input * k) + (emas[i] * (1 - k));
+                        emas[i] = Helpers.ComputeEMA(emas[i], input, k);
                     }
 
                     input = emas[i];
@@ -645,19 +645,6 @@ public static class MovingAverage
                 CancellationToken = cancellationToken,
                 MaxDegreeOfParallelism = 1,
             });
-    }
-
-    private static decimal ComputeWMACircular(decimal[] buffer, int startIndex, int count)
-    {
-        var weightedSum = 0m;
-        var length = buffer.Length;
-
-        for (var i = 0; i < count; i++)
-        {
-            weightedSum += buffer[(startIndex + i) % length] * (i + 1);
-        }
-
-        return weightedSum / (count * (count + 1) / 2m);
     }
 
 #pragma warning disable SA1202 // Lookback methods are intentionally kept at the end of the class.
