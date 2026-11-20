@@ -13,9 +13,11 @@
     <PackageProjectUrl>https://github.com/cgentsis/OpenQuant.NET</PackageProjectUrl>
     <RepositoryUrl>https://github.com/cgentsis/OpenQuant.NET</RepositoryUrl>
     <PackageTags>finance;quant;market-data;stocks;trading;analysis</PackageTags>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
   </PropertyGroup>
 
   <ItemGroup>
+    <None Include="..\..\README.md" Pack="true" PackagePath="\" />
     <PackageReference Include="System.Threading.Tasks.Dataflow" Version="9.*" />
   </ItemGroup>
 
