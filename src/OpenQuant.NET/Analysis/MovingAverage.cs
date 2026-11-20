@@ -31,14 +31,10 @@ public static class MovingAverage
         var window = new Queue<decimal>(period);
         var sum = 0m;
 
-        return new TransformBlock<EnrichedCandle, EnrichedCandle>(
+        return IndicatorFactory.Create(
+            name,
             enriched =>
             {
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    return enriched;
-                }
-
                 sum += enriched.Candle.Close;
                 window.Enqueue(enriched.Candle.Close);
 
@@ -49,16 +45,12 @@ public static class MovingAverage
 
                 if (window.Count == period)
                 {
-                    enriched.Indicators[name] = sum / period;
+                    return sum / period;
                 }
 
-                return enriched;
+                return null;
             },
-            new ExecutionDataflowBlockOptions
-            {
-                CancellationToken = cancellationToken,
-                MaxDegreeOfParallelism = 1,
-            });
+            cancellationToken);
     }
 
     /// <summary>
@@ -84,14 +76,10 @@ public static class MovingAverage
         var ema = 0m;
         var k = 2m / (period + 1);
 
-        return new TransformBlock<EnrichedCandle, EnrichedCandle>(
+        return IndicatorFactory.Create(
+            name,
             enriched =>
             {
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    return enriched;
-                }
-
                 count++;
 
                 if (count <= period)
@@ -101,22 +89,18 @@ public static class MovingAverage
                     if (count == period)
                     {
                         ema = sum / period;
-                        enriched.Indicators[name] = ema;
+                        return ema;
                     }
                 }
                 else
                 {
                     ema = Helpers.ComputeEMA(ema, enriched.Candle.Close, k);
-                    enriched.Indicators[name] = ema;
+                    return ema;
                 }
 
-                return enriched;
+                return null;
             },
-            new ExecutionDataflowBlockOptions
-            {
-                CancellationToken = cancellationToken,
-                MaxDegreeOfParallelism = 1,
-            });
+            cancellationToken);
     }
 
     /// <summary>
@@ -140,14 +124,10 @@ public static class MovingAverage
         var window = new Queue<decimal>(period);
         var divisor = period * (period + 1) / 2m;
 
-        return new TransformBlock<EnrichedCandle, EnrichedCandle>(
+        return IndicatorFactory.Create(
+            name,
             enriched =>
             {
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    return enriched;
-                }
-
                 window.Enqueue(enriched.Candle.Close);
 
                 if (window.Count > period)
@@ -166,16 +146,12 @@ public static class MovingAverage
                         weight++;
                     }
 
-                    enriched.Indicators[name] = weightedSum / divisor;
+                    return weightedSum / divisor;
                 }
 
-                return enriched;
+                return null;
             },
-            new ExecutionDataflowBlockOptions
-            {
-                CancellationToken = cancellationToken,
-                MaxDegreeOfParallelism = 1,
-            });
+            cancellationToken);
     }
 
     /// <summary>
@@ -207,14 +183,10 @@ public static class MovingAverage
         var diffIndex = 0;
         var diffCount = 0;
 
-        return new TransformBlock<EnrichedCandle, EnrichedCandle>(
+        return IndicatorFactory.Create(
+            name,
             enriched =>
             {
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    return enriched;
-                }
-
                 priceBuffer[priceIndex] = enriched.Candle.Close;
                 priceIndex = (priceIndex + 1) % period;
                 priceCount = Math.Min(priceCount + 1, period);
@@ -232,17 +204,13 @@ public static class MovingAverage
                     if (diffCount == sqrtPeriod)
                     {
                         var hma = Helpers.ComputeWMACircular(diffBuffer, diffIndex, sqrtPeriod);
-                        enriched.Indicators[name] = hma;
+                        return hma;
                     }
                 }
 
-                return enriched;
+                return null;
             },
-            new ExecutionDataflowBlockOptions
-            {
-                CancellationToken = cancellationToken,
-                MaxDegreeOfParallelism = 1,
-            });
+            cancellationToken);
     }
 
     /// <summary>
@@ -270,14 +238,10 @@ public static class MovingAverage
         var emaOfEmaSum = 0m;
         var emaOfEma = 0m;
 
-        return new TransformBlock<EnrichedCandle, EnrichedCandle>(
+        return IndicatorFactory.Create(
+            name,
             enriched =>
             {
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    return enriched;
-                }
-
                 count++;
 
                 if (count <= period)
@@ -305,23 +269,19 @@ public static class MovingAverage
                         if (emaOfEmaCount == period)
                         {
                             emaOfEma = emaOfEmaSum / period;
-                            enriched.Indicators[name] = (2m * ema) - emaOfEma;
+                            return (2m * ema) - emaOfEma;
                         }
                     }
                     else
                     {
                         emaOfEma = Helpers.ComputeEMA(emaOfEma, ema, k);
-                        enriched.Indicators[name] = (2m * ema) - emaOfEma;
+                        return (2m * ema) - emaOfEma;
                     }
                 }
 
-                return enriched;
+                return null;
             },
-            new ExecutionDataflowBlockOptions
-            {
-                CancellationToken = cancellationToken,
-                MaxDegreeOfParallelism = 1,
-            });
+            cancellationToken);
     }
 
     /// <summary>
@@ -351,14 +311,10 @@ public static class MovingAverage
         var ema3Sum = 0m;
         var ema3 = 0m;
 
-        return new TransformBlock<EnrichedCandle, EnrichedCandle>(
+        return IndicatorFactory.Create(
+            name,
             enriched =>
             {
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    return enriched;
-                }
-
                 ema1Count++;
 
                 if (ema1Count <= period)
@@ -402,23 +358,19 @@ public static class MovingAverage
                         if (ema3Count == period)
                         {
                             ema3 = ema3Sum / period;
-                            enriched.Indicators[name] = (3m * ema1) - (3m * ema2) + ema3;
+                            return (3m * ema1) - (3m * ema2) + ema3;
                         }
                     }
                     else
                     {
                         ema3 = Helpers.ComputeEMA(ema3, ema2, k);
-                        enriched.Indicators[name] = (3m * ema1) - (3m * ema2) + ema3;
+                        return (3m * ema1) - (3m * ema2) + ema3;
                     }
                 }
 
-                return enriched;
+                return null;
             },
-            new ExecutionDataflowBlockOptions
-            {
-                CancellationToken = cancellationToken,
-                MaxDegreeOfParallelism = 1,
-            });
+            cancellationToken);
     }
 
     /// <summary>
@@ -451,14 +403,10 @@ public static class MovingAverage
         var counts = new int[6];
         var sums = new decimal[6];
 
-        return new TransformBlock<EnrichedCandle, EnrichedCandle>(
+        return IndicatorFactory.Create(
+            name,
             enriched =>
             {
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    return enriched;
-                }
-
                 var input = enriched.Candle.Close;
 
                 for (var i = 0; i < 6; i++)
@@ -489,17 +437,12 @@ public static class MovingAverage
 
                 if (counts[5] >= period)
                 {
-                    enriched.Indicators[name] = (c1 * emas[5]) + (c2 * emas[4]) +
-                                                (c3 * emas[3]) + (c4 * emas[2]);
+                    return (c1 * emas[5]) + (c2 * emas[4]) + (c3 * emas[3]) + (c4 * emas[2]);
                 }
 
-                return enriched;
+                return null;
             },
-            new ExecutionDataflowBlockOptions
-            {
-                CancellationToken = cancellationToken,
-                MaxDegreeOfParallelism = 1,
-            });
+            cancellationToken);
     }
 
     /// <summary>
@@ -528,14 +471,10 @@ public static class MovingAverage
         var outerWindow = new Queue<decimal>(outerPeriod);
         var outerSum = 0m;
 
-        return new TransformBlock<EnrichedCandle, EnrichedCandle>(
+        return IndicatorFactory.Create(
+            name,
             enriched =>
             {
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    return enriched;
-                }
-
                 innerSum += enriched.Candle.Close;
                 innerWindow.Enqueue(enriched.Candle.Close);
 
@@ -558,17 +497,13 @@ public static class MovingAverage
 
                     if (outerWindow.Count == outerPeriod)
                     {
-                        enriched.Indicators[name] = outerSum / outerPeriod;
+                        return outerSum / outerPeriod;
                     }
                 }
 
-                return enriched;
+                return null;
             },
-            new ExecutionDataflowBlockOptions
-            {
-                CancellationToken = cancellationToken,
-                MaxDegreeOfParallelism = 1,
-            });
+            cancellationToken);
     }
 
     /// <summary>
@@ -595,14 +530,10 @@ public static class MovingAverage
         var kama = 0m;
         var initialized = false;
 
-        return new TransformBlock<EnrichedCandle, EnrichedCandle>(
+        return IndicatorFactory.Create(
+            name,
             enriched =>
             {
-                if (cancellationToken.IsCancellationRequested)
-                {
-                    return enriched;
-                }
-
                 window.Enqueue(enriched.Candle.Close);
 
                 if (window.Count > period + 1)
@@ -616,7 +547,7 @@ public static class MovingAverage
                     {
                         kama = enriched.Candle.Close;
                         initialized = true;
-                        enriched.Indicators[name] = kama;
+                        return kama;
                     }
                     else
                     {
@@ -634,17 +565,13 @@ public static class MovingAverage
                         sc *= sc;
 
                         kama += sc * (enriched.Candle.Close - kama);
-                        enriched.Indicators[name] = kama;
+                        return kama;
                     }
                 }
 
-                return enriched;
+                return null;
             },
-            new ExecutionDataflowBlockOptions
-            {
-                CancellationToken = cancellationToken,
-                MaxDegreeOfParallelism = 1,
-            });
+            cancellationToken);
     }
 
 #pragma warning disable SA1202 // Lookback methods are intentionally kept at the end of the class.
