@@ -9,80 +9,65 @@ public class IndicatorFactoryTests
     [Fact]
     public async Task Create_WithValidParameters_CreatesTransformBlock()
     {
-        // Arrange
-        var name = "TestIndicator";
-        var period = 3;
-        var cancellationToken = default(CancellationToken);
-        
-        Func<EnrichedCandle, IndicatorState> computationDelegate = (enriched) =>
-        {
-            return new IndicatorState { Value = 10m, Count = 1 };
-        };
+        var block = IndicatorFactory.Create("TestIndicator", _ => 10m);
 
-        // Act
-        var result = IndicatorFactory.Create(name, period, computationDelegate, cancellationToken);
-
-        // Assert
-        Assert.NotNull(result);
-        Assert.IsType<TransformBlock<EnrichedCandle, EnrichedCandle>>(result);
+        Assert.IsType<TransformBlock<EnrichedCandle, EnrichedCandle>>(block);
     }
 
     [Fact]
-    public async Task Create_WithCancellationRequested_ReturnsUnchangedCandle()
+    public async Task Create_WithCancellationRequested_DoesNotComputeValue()
     {
-        // Arrange
-        var name = "TestIndicator";
-        var period = 3;
-        var cts = new CancellationTokenSource();
-        cts.Cancel(); // Cancel immediately
-        
-        Func<EnrichedCandle, IndicatorState> computationDelegate = (enriched) =>
-        {
-            // This should not be executed due to cancellation
-            Assert.Fail("Computation delegate should not have been called due to cancellation");
-            return new IndicatorState { Value = 0m, Count = 0 };
-        };
-
+        using var cts = new CancellationTokenSource();
+        await cts.CancelAsync();
+        var called = false;
         var candle = Enrich(10m);
-        
-        // Act
-        var block = IndicatorFactory.Create(name, period, computationDelegate, cts.Token);
-        var result = await block.SendAsync(candle);
+        var block = IndicatorFactory.Create(
+            "TestIndicator",
+            _ =>
+            {
+                called = true;
+                return 1m;
+            },
+            cts.Token);
+
+        var accepted = await block.SendAsync(candle);
         block.Complete();
-        
-        // Assert - The candle should be returned unchanged (unprocessed)
-        Assert.True(result);
-        Assert.NotNull(candle);
+
+        Assert.True(accepted);
+        Assert.False(called);
+        Assert.False(candle.Indicators.ContainsKey("TestIndicator"));
     }
 
     [Fact]
     public async Task Create_WithValidComputationDelegate_ProducesExpectedResult()
     {
-        // Arrange
-        var name = "TestIndicator";
-        var period = 3;
-        var cancellationToken = default(CancellationToken);
-        
         var results = new List<EnrichedCandle>();
-        var sink = new ActionBlock<EnrichedCandle>(r => results.Add(r));
-        
-        Func<EnrichedCandle, IndicatorState> computationDelegate = (enriched) =>
-        {
-            return new IndicatorState { Value = 15m, Count = 3 };
-        };
-
-        var block = IndicatorFactory.Create(name, period, computationDelegate, cancellationToken);
+        var sink = new ActionBlock<EnrichedCandle>(results.Add);
+        var block = IndicatorFactory.Create("TestIndicator", _ => 15m);
         block.LinkTo(sink, new DataflowLinkOptions { PropagateCompletion = true });
-        
-        // Act
+
         await block.SendAsync(Enrich(10m));
         block.Complete();
         await sink.Completion;
-        
-        // Assert
+
         Assert.Single(results);
-        Assert.True(results[0].Indicators.ContainsKey(name));
-        Assert.Equal(15m, results[0].Indicators[name]);
+        Assert.Equal(15m, results[0].Indicators["TestIndicator"]);
+    }
+
+    [Fact]
+    public async Task Create_WhenIndicatorIsWarmingUp_LeavesValueAbsent()
+    {
+        var results = new List<EnrichedCandle>();
+        var sink = new ActionBlock<EnrichedCandle>(results.Add);
+        var block = IndicatorFactory.Create("TestIndicator", _ => (decimal?)null);
+        block.LinkTo(sink, new DataflowLinkOptions { PropagateCompletion = true });
+
+        await block.SendAsync(Enrich(10m));
+        block.Complete();
+        await sink.Completion;
+
+        Assert.Single(results);
+        Assert.False(results[0].Indicators.ContainsKey("TestIndicator"));
     }
 
     private static EnrichedCandle Enrich(decimal close, int dayOffset = 0) => new(new Candle
