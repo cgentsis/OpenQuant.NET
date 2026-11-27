@@ -1,53 +1,47 @@
-using NUnit.Framework;
 using System.Threading.Tasks.Dataflow;
 using OpenQuant.Analysis;
 using OpenQuant.Models;
 
-namespace OpenQuant.Tests.Analysis
+namespace OpenQuant.Tests.Analysis;
+
+/// <summary>
+/// Smoke tests confirming every extra-indicator facade returns a usable dataflow block.
+/// </summary>
+public class ExtraIndicatorsTests
 {
-    [TestFixture]
-    public class ExtraIndicatorsTests
+    [Fact]
+    public void MathTransforms_ReturnsBlock()
     {
-        [Test]
-        public void MathTransforms_ReturnsBlock()
-        {
-            var block = MathTransforms.Acos(10);
-            Assert.IsInstanceOf<TransformBlock<EnrichedCandle, EnrichedCandle>>(block);
-        }
+        Assert.IsType<TransformBlock<EnrichedCandle, EnrichedCandle>>(MathTransforms.Acos(10));
+    }
 
-        [Test]
-        public void MathOperators_ReturnsBlock()
-        {
-            var block = MathOperators.Add(10);
-            Assert.IsInstanceOf<TransformBlock<EnrichedCandle, EnrichedCandle>>(block);
-        }
+    [Fact]
+    public void MathOperators_ReturnsBlock()
+    {
+        Assert.IsType<TransformBlock<EnrichedCandle, EnrichedCandle>>(MathOperators.Add(10));
+    }
 
-        [Test]
-        public void OverlapStudiesExtra_ReturnsBlock()
-        {
-            var block = OverlapStudiesExtra.AccelerationBands(10);
-            Assert.IsInstanceOf<TransformBlock<EnrichedCandle, EnrichedCandle>>(block);
-        }
+    [Fact]
+    public void OverlapStudiesExtra_ReturnsBlock()
+    {
+        Assert.IsType<TransformBlock<EnrichedCandle, EnrichedCandle>>(OverlapStudiesExtra.AccelerationBands(10));
+    }
 
-        [Test]
-        public void MomentumExtra_ReturnsBlock()
-        {
-            var block = MomentumExtra.AcceleratorOscillator(10);
-            Assert.IsInstanceOf<TransformBlock<EnrichedCandle, EnrichedCandle>>(block);
-        }
+    [Fact]
+    public void MomentumExtra_ReturnsBlock()
+    {
+        Assert.IsType<TransformBlock<EnrichedCandle, EnrichedCandle>>(MomentumExtra.AcceleratorOscillator(10));
+    }
 
-        [Test]
-        public void VolumeExtra_ReturnsBlock()
-        {
-            var block = VolumeExtra.ChaikinMoneyFlow(10);
-            Assert.IsInstanceOf<TransformBlock<EnrichedCandle, EnrichedCandle>>(block);
-        }
+    [Fact]
+    public void VolumeExtra_ReturnsBlock()
+    {
+        Assert.IsType<TransformBlock<EnrichedCandle, EnrichedCandle>>(VolumeExtra.ChaikinMoneyFlow(10));
+    }
 
-        [Test]
-        public void VolatilityExtra_ReturnsBlock()
-        {
-            var block = VolatilityExtra.AverageDayRange(10);
-            Assert.IsInstanceOf<TransformBlock<EnrichedCandle, EnrichedCandle>>(block);
-        }
+    [Fact]
+    public void VolatilityExtra_ReturnsBlock()
+    {
+        Assert.IsType<TransformBlock<EnrichedCandle, EnrichedCandle>>(VolatilityExtra.AverageDayRange(10));
     }
 }
