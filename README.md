@@ -9,7 +9,7 @@ OpenQuant.NET is an open‑source .NET library providing unified financial data 
 - **Unified data model** – `Candle` record for OHLCV (Open, High, Low, Close, Volume) price data
 - **Provider abstraction** – `IMarketDataProvider` interface to plug in any market‑data source
 - **Yahoo Finance provider** – Built‑in provider for retrieving historical and latest candle data
-- **Technical analysis** – 150+ indicators as chainable TPL Dataflow `TransformBlock` pipeline stages
+- **Technical analysis** – 150+ indicators (now including Math Transforms, Math Operators, extra Overlap Studies, Momentum, Volume, and Volatility indicators) as chainable TPL Dataflow `TransformBlock` pipeline stages
   - Moving Averages: SMA, EMA, WMA, HMA, DEMA, TEMA, T3, TRIMA, KAMA, Median
   - Price Transforms: AVGPRICE, MEDPRICE, TYPPRICE, WCLPRICE, BOP, True Range
   - Rolling Window: SUM, MAX, MIN, MAXINDEX, MININDEX, MINMAX, MINMAXINDEX, MIDPOINT, MIDPRICE, MOM, ROC, ROCP, ROCR, ROCR100
