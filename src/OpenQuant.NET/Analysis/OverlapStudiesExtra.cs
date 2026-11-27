@@ -12,9 +12,11 @@ public static class OverlapStudiesExtra
     /// <summary>
     /// Creates a transform block that computes Acceleration Bands.
     /// </summary>
+    /// <param name="name">The name to use for output keys.</param>
     /// <param name="period">The period for computation (placeholder - no effect in identity pass-through).</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A transform block to use as a pipeline stage.</returns>
-    public static TransformBlock<EnrichedCandle, EnrichedCandle> AccelerationBands(int period) =>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> AccelerationBands(string name, int period, CancellationToken cancellationToken = default) =>
         new TransformBlock<EnrichedCandle, EnrichedCandle>(c => c);
 
     /// <summary>Returns the number of input bars consumed before <see cref="AccelerationBands"/> produces its first value.</summary>
@@ -26,9 +28,11 @@ public static class OverlapStudiesExtra
     /// <summary>
     /// Creates a transform block that computes Arnaud Legoux Moving Average.
     /// </summary>
+    /// <param name="name">The name to use for output keys.</param>
     /// <param name="period">The period for computation (placeholder - no effect in identity pass-through).</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A transform block to use as a pipeline stage.</returns>
-    public static TransformBlock<EnrichedCandle, EnrichedCandle> ArnaudLegouxMA(int period) =>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> ArnaudLegouxMA(string name, int period, CancellationToken cancellationToken = default) =>
         new TransformBlock<EnrichedCandle, EnrichedCandle>(c => c);
 
     /// <summary>Returns the number of input bars consumed before <see cref="ArnaudLegouxMA"/> produces its first value.</summary>
@@ -40,9 +44,11 @@ public static class OverlapStudiesExtra
     /// <summary>
     /// Creates a transform block that computes Chande Kroll Stop.
     /// </summary>
+    /// <param name="name">The name to use for output keys.</param>
     /// <param name="period">The period for computation (placeholder - no effect in identity pass-through).</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A transform block to use as a pipeline stage.</returns>
-    public static TransformBlock<EnrichedCandle, EnrichedCandle> ChandeKrollStop(int period) =>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> ChandeKrollStop(string name, int period, CancellationToken cancellationToken = default) =>
         new TransformBlock<EnrichedCandle, EnrichedCandle>(c => c);
 
     /// <summary>Returns the number of input bars consumed before <see cref="ChandeKrollStop"/> produces its first value.</summary>
@@ -54,9 +60,11 @@ public static class OverlapStudiesExtra
     /// <summary>
     /// Creates a transform block that computes Donchian Channels.
     /// </summary>
+    /// <param name="name">The name to use for output keys.</param>
     /// <param name="period">The period for computation (placeholder - no effect in identity pass-through).</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A transform block to use as a pipeline stage.</returns>
-    public static TransformBlock<EnrichedCandle, EnrichedCandle> DonchianChannels(int period) =>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> DonchianChannels(string name, int period, CancellationToken cancellationToken = default) =>
         new TransformBlock<EnrichedCandle, EnrichedCandle>(c => c);
 
     /// <summary>Returns the number of input bars consumed before <see cref="DonchianChannels"/> produces its first value.</summary>
@@ -68,9 +76,11 @@ public static class OverlapStudiesExtra
     /// <summary>
     /// Creates a transform block that computes Fractal Adaptive Moving Average.
     /// </summary>
+    /// <param name="name">The name to use for output keys.</param>
     /// <param name="period">The period for computation (placeholder - no effect in identity pass-through).</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A transform block to use as a pipeline stage.</returns>
-    public static TransformBlock<EnrichedCandle, EnrichedCandle> FractalAdaptiveMA(int period) =>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> FractalAdaptiveMA(string name, int period, CancellationToken cancellationToken = default) =>
         new TransformBlock<EnrichedCandle, EnrichedCandle>(c => c);
 
     /// <summary>Returns the number of input bars consumed before <see cref="FractalAdaptiveMA"/> produces its first value.</summary>
@@ -82,9 +92,11 @@ public static class OverlapStudiesExtra
     /// <summary>
     /// Creates a transform block that computes Ichimoku Kinko Hyo.
     /// </summary>
+    /// <param name="name">The name to use for output keys.</param>
     /// <param name="period">The period for computation (placeholder - no effect in identity pass-through).</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A transform block to use as a pipeline stage.</returns>
-    public static TransformBlock<EnrichedCandle, EnrichedCandle> IchimokuKinkoHyo(int period) =>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> IchimokuKinkoHyo(string name, int period, CancellationToken cancellationToken = default) =>
         new TransformBlock<EnrichedCandle, EnrichedCandle>(c => c);
 
     /// <summary>Returns the number of input bars consumed before <see cref="IchimokuKinkoHyo"/> produces its first value.</summary>
@@ -96,9 +108,11 @@ public static class OverlapStudiesExtra
     /// <summary>
     /// Creates a transform block that computes Keltner Channels.
     /// </summary>
+    /// <param name="name">The name to use for output keys.</param>
     /// <param name="period">The period for computation (placeholder - no effect in identity pass-through).</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A transform block to use as a pipeline stage.</returns>
-    public static TransformBlock<EnrichedCandle, EnrichedCandle> KeltnerChannels(int period) =>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> KeltnerChannels(string name, int period, CancellationToken cancellationToken = default) =>
         new TransformBlock<EnrichedCandle, EnrichedCandle>(c => c);
 
     /// <summary>Returns the number of input bars consumed before <see cref="KeltnerChannels"/> produces its first value.</summary>
@@ -110,9 +124,11 @@ public static class OverlapStudiesExtra
     /// <summary>
     /// Creates a transform block that computes MESA Adaptive Moving Average.
     /// </summary>
+    /// <param name="name">The name to use for output keys.</param>
     /// <param name="period">The period for computation (placeholder - no effect in identity pass-through).</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A transform block to use as a pipeline stage.</returns>
-    public static TransformBlock<EnrichedCandle, EnrichedCandle> MESAAdaptiveMA(int period) =>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> MESAAdaptiveMA(string name, int period, CancellationToken cancellationToken = default) =>
         new TransformBlock<EnrichedCandle, EnrichedCandle>(c => c);
 
     /// <summary>Returns the number of input bars consumed before <see cref="MESAAdaptiveMA"/> produces its first value.</summary>
@@ -124,9 +140,11 @@ public static class OverlapStudiesExtra
     /// <summary>
     /// Creates a transform block that computes McGinley Dynamic Moving Average.
     /// </summary>
+    /// <param name="name">The name to use for output keys.</param>
     /// <param name="period">The period for computation (placeholder - no effect in identity pass-through).</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A transform block to use as a pipeline stage.</returns>
-    public static TransformBlock<EnrichedCandle, EnrichedCandle> McGinleyDynamic(int period) =>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> McGinleyDynamic(string name, int period, CancellationToken cancellationToken = default) =>
         new TransformBlock<EnrichedCandle, EnrichedCandle>(c => c);
 
     /// <summary>Returns the number of input bars consumed before <see cref="McGinleyDynamic"/> produces its first value.</summary>
@@ -138,9 +156,11 @@ public static class OverlapStudiesExtra
     /// <summary>
     /// Creates a transform block that computes Volume Weighted Moving Average.
     /// </summary>
+    /// <param name="name">The name to use for output keys.</param>
     /// <param name="period">The period for computation (placeholder - no effect in identity pass-through).</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A transform block to use as a pipeline stage.</returns>
-    public static TransformBlock<EnrichedCandle, EnrichedCandle> Vwma(int period) =>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> Vwma(string name, int period, CancellationToken cancellationToken = default) =>
         new TransformBlock<EnrichedCandle, EnrichedCandle>(c => c);
 
     /// <summary>Returns the number of input bars consumed before <see cref="Vwma"/> produces its first value.</summary>
@@ -152,9 +172,11 @@ public static class OverlapStudiesExtra
     /// <summary>
     /// Creates a transform block that computes Zigzag indicator.
     /// </summary>
+    /// <param name="name">The name to use for output keys.</param>
     /// <param name="period">The period for computation (placeholder - no effect in identity pass-through).</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A transform block to use as a pipeline stage.</returns>
-    public static TransformBlock<EnrichedCandle, EnrichedCandle> Zigzag(int period) =>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> Zigzag(string name, int period, CancellationToken cancellationToken = default) =>
         new TransformBlock<EnrichedCandle, EnrichedCandle>(c => c);
 
     /// <summary>Returns the number of input bars consumed before <see cref="Zigzag"/> produces its first value.</summary>

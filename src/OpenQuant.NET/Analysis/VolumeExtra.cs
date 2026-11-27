@@ -12,9 +12,11 @@ public static class VolumeExtra
     /// <summary>
     /// Creates a transform block that computes the Chaikin Money Flow.
     /// </summary>
+    /// <param name="name">The name to use for output keys.</param>
     /// <param name="period">The period for computation (placeholder - no effect in identity pass-through).</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A transform block to use as a pipeline stage.</returns>
-    public static TransformBlock<EnrichedCandle, EnrichedCandle> ChaikinMoneyFlow(int period) =>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> ChaikinMoneyFlow(string name, int period, CancellationToken cancellationToken = default) =>
         new TransformBlock<EnrichedCandle, EnrichedCandle>(c => c);
 
     /// <summary>Returns the number of input bars consumed before <see cref="ChaikinMoneyFlow"/> produces its first value.</summary>
@@ -26,9 +28,11 @@ public static class VolumeExtra
     /// <summary>
     /// Creates a transform block that computes the Elder Force Index.
     /// </summary>
+    /// <param name="name">The name to use for output keys.</param>
     /// <param name="period">The period for computation (placeholder - no effect in identity pass-through).</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A transform block to use as a pipeline stage.</returns>
-    public static TransformBlock<EnrichedCandle, EnrichedCandle> ElderForceIndex(int period) =>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> ElderForceIndex(string name, int period, CancellationToken cancellationToken = default) =>
         new TransformBlock<EnrichedCandle, EnrichedCandle>(c => c);
 
     /// <summary>Returns the number of input bars consumed before <see cref="ElderForceIndex"/> produces its first value.</summary>
@@ -40,9 +44,11 @@ public static class VolumeExtra
     /// <summary>
     /// Creates a transform block that computes the Arms Ease of Movement.
     /// </summary>
+    /// <param name="name">The name to use for output keys.</param>
     /// <param name="period">The period for computation (placeholder - no effect in identity pass-through).</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A transform block to use as a pipeline stage.</returns>
-    public static TransformBlock<EnrichedCandle, EnrichedCandle> ArmsEaseOfMovement(int period) =>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> ArmsEaseOfMovement(string name, int period, CancellationToken cancellationToken = default) =>
         new TransformBlock<EnrichedCandle, EnrichedCandle>(c => c);
 
     /// <summary>Returns the number of input bars consumed before <see cref="ArmsEaseOfMovement"/> produces its first value.</summary>
@@ -54,9 +60,11 @@ public static class VolumeExtra
     /// <summary>
     /// Creates a transform block that computes the Klinger Volume Oscillator.
     /// </summary>
+    /// <param name="name">The name to use for output keys.</param>
     /// <param name="period">The period for computation (placeholder - no effect in identity pass-through).</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A transform block to use as a pipeline stage.</returns>
-    public static TransformBlock<EnrichedCandle, EnrichedCandle> KlingerVolumeOscillator(int period) =>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> KlingerVolumeOscillator(string name, int period, CancellationToken cancellationToken = default) =>
         new TransformBlock<EnrichedCandle, EnrichedCandle>(c => c);
 
     /// <summary>Returns the number of input bars consumed before <see cref="KlingerVolumeOscillator"/> produces its first value.</summary>
@@ -68,9 +76,11 @@ public static class VolumeExtra
     /// <summary>
     /// Creates a transform block that computes the Market Facilitation Index.
     /// </summary>
+    /// <param name="name">The name to use for output keys.</param>
     /// <param name="period">The period for computation (placeholder - no effect in identity pass-through).</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A transform block to use as a pipeline stage.</returns>
-    public static TransformBlock<EnrichedCandle, EnrichedCandle> MarketFacilitationIndex(int period) =>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> MarketFacilitationIndex(string name, int period, CancellationToken cancellationToken = default) =>
         new TransformBlock<EnrichedCandle, EnrichedCandle>(c => c);
 
     /// <summary>Returns the number of input bars consumed before <see cref="MarketFacilitationIndex"/> produces its first value.</summary>
@@ -82,9 +92,11 @@ public static class VolumeExtra
     /// <summary>
     /// Creates a transform block that computes the Positive Volume Index.
     /// </summary>
+    /// <param name="name">The name to use for output keys.</param>
     /// <param name="period">The period for computation (placeholder - no effect in identity pass-through).</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A transform block to use as a pipeline stage.</returns>
-    public static TransformBlock<EnrichedCandle, EnrichedCandle> PositiveVolumeIndex(int period) =>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> PositiveVolumeIndex(string name, int period, CancellationToken cancellationToken = default) =>
         new TransformBlock<EnrichedCandle, EnrichedCandle>(c => c);
 
     /// <summary>Returns the number of input bars consumed before <see cref="PositiveVolumeIndex"/> produces its first value.</summary>
@@ -96,9 +108,11 @@ public static class VolumeExtra
     /// <summary>
     /// Creates a transform block that computes the Positive Volume Oscillator.
     /// </summary>
+    /// <param name="name">The name to use for output keys.</param>
     /// <param name="period">The period for computation (placeholder - no effect in identity pass-through).</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A transform block to use as a pipeline stage.</returns>
-    public static TransformBlock<EnrichedCandle, EnrichedCandle> PositiveVolumeOscillator(int period) =>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> PositiveVolumeOscillator(string name, int period, CancellationToken cancellationToken = default) =>
         new TransformBlock<EnrichedCandle, EnrichedCandle>(c => c);
 
     /// <summary>Returns the number of input bars consumed before <see cref="PositiveVolumeOscillator"/> produces its first value.</summary>

@@ -12,9 +12,11 @@ public static class MomentumExtra
     /// <summary>
     /// Creates a transform block that computes the Accelerator Oscillator.
     /// </summary>
+    /// <param name="name">The name to use for output keys.</param>
     /// <param name="period">The period for computation (placeholder - no effect in identity pass-through).</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A transform block to use as a pipeline stage.</returns>
-    public static TransformBlock<EnrichedCandle, EnrichedCandle> AcceleratorOscillator(int period) =>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> AcceleratorOscillator(string name, int period, CancellationToken cancellationToken = default) =>
         new TransformBlock<EnrichedCandle, EnrichedCandle>(c => c);
 
     /// <summary>Returns the number of input bars consumed before <see cref="AcceleratorOscillator"/> produces its first value.</summary>
@@ -26,9 +28,11 @@ public static class MomentumExtra
     /// <summary>
     /// Creates a transform block that computes the Awesome Oscillator.
     /// </summary>
+    /// <param name="name">The name to use for output keys.</param>
     /// <param name="period">The period for computation (placeholder - no effect in identity pass-through).</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A transform block to use as a pipeline stage.</returns>
-    public static TransformBlock<EnrichedCandle, EnrichedCandle> AwesomeOscillator(int period) =>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> AwesomeOscillator(string name, int period, CancellationToken cancellationToken = default) =>
         new TransformBlock<EnrichedCandle, EnrichedCandle>(c => c);
 
     /// <summary>Returns the number of input bars consumed before <see cref="AwesomeOscillator"/> produces its first value.</summary>
@@ -40,9 +44,11 @@ public static class MomentumExtra
     /// <summary>
     /// Creates a transform block that computes the Center of Gravity.
     /// </summary>
+    /// <param name="name">The name to use for output keys.</param>
     /// <param name="period">The period for computation (placeholder - no effect in identity pass-through).</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A transform block to use as a pipeline stage.</returns>
-    public static TransformBlock<EnrichedCandle, EnrichedCandle> CenterOfGravity(int period) =>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> CenterOfGravity(string name, int period, CancellationToken cancellationToken = default) =>
         new TransformBlock<EnrichedCandle, EnrichedCandle>(c => c);
 
     /// <summary>Returns the number of input bars consumed before <see cref="CenterOfGravity"/> produces its first value.</summary>
@@ -54,9 +60,11 @@ public static class MomentumExtra
     /// <summary>
     /// Creates a transform block that computes the Choppiness Index.
     /// </summary>
+    /// <param name="name">The name to use for output keys.</param>
     /// <param name="period">The period for computation (placeholder - no effect in identity pass-through).</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A transform block to use as a pipeline stage.</returns>
-    public static TransformBlock<EnrichedCandle, EnrichedCandle> ChoppinessIndex(int period) =>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> ChoppinessIndex(string name, int period, CancellationToken cancellationToken = default) =>
         new TransformBlock<EnrichedCandle, EnrichedCandle>(c => c);
 
     /// <summary>Returns the number of input bars consumed before <see cref="ChoppinessIndex"/> produces its first value.</summary>
@@ -68,9 +76,11 @@ public static class MomentumExtra
     /// <summary>
     /// Creates a transform block that computes the Choppiness Index with True Range Box.
     /// </summary>
+    /// <param name="name">The name to use for output keys.</param>
     /// <param name="period">The period for computation (placeholder - no effect in identity pass-through).</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A transform block to use as a pipeline stage.</returns>
-    public static TransformBlock<EnrichedCandle, EnrichedCandle> ChoppinessIndexTrueRangeBox(int period) =>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> ChoppinessIndexTrueRangeBox(string name, int period, CancellationToken cancellationToken = default) =>
         new TransformBlock<EnrichedCandle, EnrichedCandle>(c => c);
 
     /// <summary>Returns the number of input bars consumed before <see cref="ChoppinessIndexTrueRangeBox"/> produces its first value.</summary>
@@ -82,9 +92,11 @@ public static class MomentumExtra
     /// <summary>
     /// Creates a transform block that computes the Coppock Curve.
     /// </summary>
+    /// <param name="name">The name to use for output keys.</param>
     /// <param name="period">The period for computation (placeholder - no effect in identity pass-through).</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A transform block to use as a pipeline stage.</returns>
-    public static TransformBlock<EnrichedCandle, EnrichedCandle> CoppockCurve(int period) =>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> CoppockCurve(string name, int period, CancellationToken cancellationToken = default) =>
         new TransformBlock<EnrichedCandle, EnrichedCandle>(c => c);
 
     /// <summary>Returns the number of input bars consumed before <see cref="CoppockCurve"/> produces its first value.</summary>
@@ -96,9 +108,11 @@ public static class MomentumExtra
     /// <summary>
     /// Creates a transform block that computes the Connors RSI.
     /// </summary>
+    /// <param name="name">The name to use for output keys.</param>
     /// <param name="period">The period for computation (placeholder - no effect in identity pass-through).</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A transform block to use as a pipeline stage.</returns>
-    public static TransformBlock<EnrichedCandle, EnrichedCandle> ConnorsRSI(int period) =>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> ConnorsRSI(string name, int period, CancellationToken cancellationToken = default) =>
         new TransformBlock<EnrichedCandle, EnrichedCandle>(c => c);
 
     /// <summary>Returns the number of input bars consumed before <see cref="ConnorsRSI"/> produces its first value.</summary>
@@ -110,9 +124,11 @@ public static class MomentumExtra
     /// <summary>
     /// Creates a transform block that computes the Correlation Trend Indicator.
     /// </summary>
+    /// <param name="name">The name to use for output keys.</param>
     /// <param name="period">The period for computation (placeholder - no effect in identity pass-through).</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A transform block to use as a pipeline stage.</returns>
-    public static TransformBlock<EnrichedCandle, EnrichedCandle> CorrelationTrendIndicator(int period) =>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> CorrelationTrendIndicator(string name, int period, CancellationToken cancellationToken = default) =>
         new TransformBlock<EnrichedCandle, EnrichedCandle>(c => c);
 
     /// <summary>Returns the number of input bars consumed before <see cref="CorrelationTrendIndicator"/> produces its first value.</summary>
@@ -124,9 +140,11 @@ public static class MomentumExtra
     /// <summary>
     /// Creates a transform block that computes the Derivative Oscillator.
     /// </summary>
+    /// <param name="name">The name to use for output keys.</param>
     /// <param name="period">The period for computation (placeholder - no effect in identity pass-through).</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A transform block to use as a pipeline stage.</returns>
-    public static TransformBlock<EnrichedCandle, EnrichedCandle> DerivativeOscillator(int period) =>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> DerivativeOscillator(string name, int period, CancellationToken cancellationToken = default) =>
         new TransformBlock<EnrichedCandle, EnrichedCandle>(c => c);
 
     /// <summary>Returns the number of input bars consumed before <see cref="DerivativeOscillator"/> produces its first value.</summary>
@@ -138,9 +156,11 @@ public static class MomentumExtra
     /// <summary>
     /// Creates a transform block that computes the Detrended Price Oscillator.
     /// </summary>
+    /// <param name="name">The name to use for output keys.</param>
     /// <param name="period">The period for computation (placeholder - no effect in identity pass-through).</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A transform block to use as a pipeline stage.</returns>
-    public static TransformBlock<EnrichedCandle, EnrichedCandle> DetrendedPriceOscillator(int period) =>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> DetrendedPriceOscillator(string name, int period, CancellationToken cancellationToken = default) =>
         new TransformBlock<EnrichedCandle, EnrichedCandle>(c => c);
 
     /// <summary>Returns the number of input bars consumed before <see cref="DetrendedPriceOscillator"/> produces its first value.</summary>

@@ -13,9 +13,10 @@ public static class MathTransforms
     /// <summary>
     /// Creates a transform block that computes the arc cosine of the close price.
     /// </summary>
-    /// <param name="period">The period for computation (placeholder - no effect in identity pass-through).</param>
+    /// <param name="name">The name to use for output keys.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A transform block to use as a pipeline stage.</returns>
-    public static TransformBlock<EnrichedCandle, EnrichedCandle> Acos(int period) =>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> Acos(string name, CancellationToken cancellationToken = default) =>
         new TransformBlock<EnrichedCandle, EnrichedCandle>(c => c);
 
     /// <summary>Returns the number of input bars consumed before <see cref="Acos"/> produces its first value.</summary>
@@ -27,9 +28,10 @@ public static class MathTransforms
     /// <summary>
     /// Creates a transform block that computes the arc sine of the close price.
     /// </summary>
-    /// <param name="period">The period for computation (placeholder - no effect in identity pass-through).</param>
+    /// <param name="name">The name to use for output keys.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A transform block to use as a pipeline stage.</returns>
-    public static TransformBlock<EnrichedCandle, EnrichedCandle> Asin(int period) =>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> Asin(string name, CancellationToken cancellationToken = default) =>
         new TransformBlock<EnrichedCandle, EnrichedCandle>(c => c);
 
     /// <summary>Returns the number of input bars consumed before <see cref="Asin"/> produces its first value.</summary>
@@ -41,9 +43,10 @@ public static class MathTransforms
     /// <summary>
     /// Creates a transform block that computes the arc tangent of the close price.
     /// </summary>
-    /// <param name="period">The period for computation (placeholder - no effect in identity pass-through).</param>
+    /// <param name="name">The name to use for output keys.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A transform block to use as a pipeline stage.</returns>
-    public static TransformBlock<EnrichedCandle, EnrichedCandle> Atan(int period) =>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> Atan(string name, CancellationToken cancellationToken = default) =>
         new TransformBlock<EnrichedCandle, EnrichedCandle>(c => c);
 
     /// <summary>Returns the number of input bars consumed before <see cref="Atan"/> produces its first value.</summary>
@@ -55,9 +58,10 @@ public static class MathTransforms
     /// <summary>
     /// Creates a transform block that computes the ceiling of the close price.
     /// </summary>
-    /// <param name="period">The period for computation (placeholder - no effect in identity pass-through).</param>
+    /// <param name="name">The name to use for output keys.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A transform block to use as a pipeline stage.</returns>
-    public static TransformBlock<EnrichedCandle, EnrichedCandle> Ceil(int period) =>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> Ceil(string name, CancellationToken cancellationToken = default) =>
         new TransformBlock<EnrichedCandle, EnrichedCandle>(c => c);
 
     /// <summary>Returns the number of input bars consumed before <see cref="Ceil"/> produces its first value.</summary>
@@ -69,9 +73,10 @@ public static class MathTransforms
     /// <summary>
     /// Creates a transform block that computes the cosine of the close price.
     /// </summary>
-    /// <param name="period">The period for computation (placeholder - no effect in identity pass-through).</param>
+    /// <param name="name">The name to use for output keys.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A transform block to use as a pipeline stage.</returns>
-    public static TransformBlock<EnrichedCandle, EnrichedCandle> Cos(int period) =>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> Cos(string name, CancellationToken cancellationToken = default) =>
         new TransformBlock<EnrichedCandle, EnrichedCandle>(c => c);
 
     /// <summary>Returns the number of input bars consumed before <see cref="Cos"/> produces its first value.</summary>
@@ -83,9 +88,10 @@ public static class MathTransforms
     /// <summary>
     /// Creates a transform block that computes the hyperbolic cosine of the close price.
     /// </summary>
-    /// <param name="period">The period for computation (placeholder - no effect in identity pass-through).</param>
+    /// <param name="name">The name to use for output keys.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A transform block to use as a pipeline stage.</returns>
-    public static TransformBlock<EnrichedCandle, EnrichedCandle> Cosh(int period) =>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> Cosh(string name, CancellationToken cancellationToken = default) =>
         new TransformBlock<EnrichedCandle, EnrichedCandle>(c => c);
 
     /// <summary>Returns the number of input bars consumed before <see cref="Cosh"/> produces its first value.</summary>
@@ -97,9 +103,10 @@ public static class MathTransforms
     /// <summary>
     /// Creates a transform block that computes the exponential of the close price.
     /// </summary>
-    /// <param name="period">The period for computation (placeholder - no effect in identity pass-through).</param>
+    /// <param name="name">The name to use for output keys.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A transform block to use as a pipeline stage.</returns>
-    public static TransformBlock<EnrichedCandle, EnrichedCandle> Exp(int period) =>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> Exp(string name, CancellationToken cancellationToken = default) =>
         new TransformBlock<EnrichedCandle, EnrichedCandle>(c => c);
 
     /// <summary>Returns the number of input bars consumed before <see cref="Exp"/> produces its first value.</summary>
@@ -111,9 +118,10 @@ public static class MathTransforms
     /// <summary>
     /// Creates a transform block that computes the floor of the close price.
     /// </summary>
-    /// <param name="period">The period for computation (placeholder - no effect in identity pass-through).</param>
+    /// <param name="name">The name to use for output keys.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A transform block to use as a pipeline stage.</returns>
-    public static TransformBlock<EnrichedCandle, EnrichedCandle> Floor(int period) =>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> Floor(string name, CancellationToken cancellationToken = default) =>
         new TransformBlock<EnrichedCandle, EnrichedCandle>(c => c);
 
     /// <summary>Returns the number of input bars consumed before <see cref="Floor"/> produces its first value.</summary>
@@ -125,9 +133,10 @@ public static class MathTransforms
     /// <summary>
     /// Creates a transform block that computes the natural logarithm of the close price.
     /// </summary>
-    /// <param name="period">The period for computation (placeholder - no effect in identity pass-through).</param>
+    /// <param name="name">The name to use for output keys.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A transform block to use as a pipeline stage.</returns>
-    public static TransformBlock<EnrichedCandle, EnrichedCandle> Ln(int period) =>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> Ln(string name, CancellationToken cancellationToken = default) =>
         new TransformBlock<EnrichedCandle, EnrichedCandle>(c => c);
 
     /// <summary>Returns the number of input bars consumed before <see cref="Ln"/> produces its first value.</summary>
@@ -139,9 +148,10 @@ public static class MathTransforms
     /// <summary>
     /// Creates a transform block that computes the base-10 logarithm of the close price.
     /// </summary>
-    /// <param name="period">The period for computation (placeholder - no effect in identity pass-through).</param>
+    /// <param name="name">The name to use for output keys.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A transform block to use as a pipeline stage.</returns>
-    public static TransformBlock<EnrichedCandle, EnrichedCandle> Log10(int period) =>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> Log10(string name, CancellationToken cancellationToken = default) =>
         new TransformBlock<EnrichedCandle, EnrichedCandle>(c => c);
 
     /// <summary>Returns the number of input bars consumed before <see cref="Log10"/> produces its first value.</summary>
@@ -153,9 +163,10 @@ public static class MathTransforms
     /// <summary>
     /// Creates a transform block that computes the sine of the close price.
     /// </summary>
-    /// <param name="period">The period for computation (placeholder - no effect in identity pass-through).</param>
+    /// <param name="name">The name to use for output keys.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A transform block to use as a pipeline stage.</returns>
-    public static TransformBlock<EnrichedCandle, EnrichedCandle> Sin(int period) =>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> Sin(string name, CancellationToken cancellationToken = default) =>
         new TransformBlock<EnrichedCandle, EnrichedCandle>(c => c);
 
     /// <summary>Returns the number of input bars consumed before <see cref="Sin"/> produces its first value.</summary>
@@ -167,9 +178,10 @@ public static class MathTransforms
     /// <summary>
     /// Creates a transform block that computes the hyperbolic sine of the close price.
     /// </summary>
-    /// <param name="period">The period for computation (placeholder - no effect in identity pass-through).</param>
+    /// <param name="name">The name to use for output keys.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A transform block to use as a pipeline stage.</returns>
-    public static TransformBlock<EnrichedCandle, EnrichedCandle> Sinh(int period) =>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> Sinh(string name, CancellationToken cancellationToken = default) =>
         new TransformBlock<EnrichedCandle, EnrichedCandle>(c => c);
 
     /// <summary>Returns the number of input bars consumed before <see cref="Sinh"/> produces its first value.</summary>
@@ -181,9 +193,10 @@ public static class MathTransforms
     /// <summary>
     /// Creates a transform block that computes the square root of the close price.
     /// </summary>
-    /// <param name="period">The period for computation (placeholder - no effect in identity pass-through).</param>
+    /// <param name="name">The name to use for output keys.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A transform block to use as a pipeline stage.</returns>
-    public static TransformBlock<EnrichedCandle, EnrichedCandle> Sqrt(int period) =>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> Sqrt(string name, CancellationToken cancellationToken = default) =>
         new TransformBlock<EnrichedCandle, EnrichedCandle>(c => c);
 
     /// <summary>Returns the number of input bars consumed before <see cref="Sqrt"/> produces its first value.</summary>
@@ -195,9 +208,10 @@ public static class MathTransforms
     /// <summary>
     /// Creates a transform block that computes the tangent of the close price.
     /// </summary>
-    /// <param name="period">The period for computation (placeholder - no effect in identity pass-through).</param>
+    /// <param name="name">The name to use for output keys.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A transform block to use as a pipeline stage.</returns>
-    public static TransformBlock<EnrichedCandle, EnrichedCandle> Tan(int period) =>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> Tan(string name, CancellationToken cancellationToken = default) =>
         new TransformBlock<EnrichedCandle, EnrichedCandle>(c => c);
 
     /// <summary>Returns the number of input bars consumed before <see cref="Tan"/> produces its first value.</summary>
@@ -209,9 +223,10 @@ public static class MathTransforms
     /// <summary>
     /// Creates a transform block that computes the hyperbolic tangent of the close price.
     /// </summary>
-    /// <param name="period">The period for computation (placeholder - no effect in identity pass-through).</param>
+    /// <param name="name">The name to use for output keys.</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A transform block to use as a pipeline stage.</returns>
-    public static TransformBlock<EnrichedCandle, EnrichedCandle> Tanh(int period) =>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> Tanh(string name, CancellationToken cancellationToken = default) =>
         new TransformBlock<EnrichedCandle, EnrichedCandle>(c => c);
 
     /// <summary>Returns the number of input bars consumed before <see cref="Tanh"/> produces its first value.</summary>

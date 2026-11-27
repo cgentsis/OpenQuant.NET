@@ -12,9 +12,11 @@ public static class VolatilityExtra
     /// <summary>
     /// Creates a transform block that computes the Average Day Range.
     /// </summary>
+    /// <param name="name">The name to use for output keys.</param>
     /// <param name="period">The period for computation (placeholder - no effect in identity pass-through).</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A transform block to use as a pipeline stage.</returns>
-    public static TransformBlock<EnrichedCandle, EnrichedCandle> AverageDayRange(int period) =>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> AverageDayRange(string name, int period, CancellationToken cancellationToken = default) =>
         new TransformBlock<EnrichedCandle, EnrichedCandle>(c => c);
 
     /// <summary>Returns the number of input bars consumed before <see cref="AverageDayRange"/> produces its first value.</summary>
@@ -26,9 +28,11 @@ public static class VolatilityExtra
     /// <summary>
     /// Creates a transform block that computes the Bollinger Band Width.
     /// </summary>
+    /// <param name="name">The name to use for output keys.</param>
     /// <param name="period">The period for computation (placeholder - no effect in identity pass-through).</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A transform block to use as a pipeline stage.</returns>
-    public static TransformBlock<EnrichedCandle, EnrichedCandle> BollingerBandWidth(int period) =>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> BollingerBandWidth(string name, int period, CancellationToken cancellationToken = default) =>
         new TransformBlock<EnrichedCandle, EnrichedCandle>(c => c);
 
     /// <summary>Returns the number of input bars consumed before <see cref="BollingerBandWidth"/> produces its first value.</summary>
@@ -40,9 +44,11 @@ public static class VolatilityExtra
     /// <summary>
     /// Creates a transform block that computes the Chaikin Volatility.
     /// </summary>
+    /// <param name="name">The name to use for output keys.</param>
     /// <param name="period">The period for computation (placeholder - no effect in identity pass-through).</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A transform block to use as a pipeline stage.</returns>
-    public static TransformBlock<EnrichedCandle, EnrichedCandle> ChaikinVolatility(int period) =>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> ChaikinVolatility(string name, int period, CancellationToken cancellationToken = default) =>
         new TransformBlock<EnrichedCandle, EnrichedCandle>(c => c);
 
     /// <summary>Returns the number of input bars consumed before <see cref="ChaikinVolatility"/> produces its first value.</summary>
@@ -54,9 +60,11 @@ public static class VolatilityExtra
     /// <summary>
     /// Creates a transform block that computes the Mass Index.
     /// </summary>
+    /// <param name="name">The name to use for output keys.</param>
     /// <param name="period">The period for computation (placeholder - no effect in identity pass-through).</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A transform block to use as a pipeline stage.</returns>
-    public static TransformBlock<EnrichedCandle, EnrichedCandle> MassIndex(int period) =>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> MassIndex(string name, int period, CancellationToken cancellationToken = default) =>
         new TransformBlock<EnrichedCandle, EnrichedCandle>(c => c);
 
     /// <summary>Returns the number of input bars consumed before <see cref="MassIndex"/> produces its first value.</summary>
@@ -68,9 +76,11 @@ public static class VolatilityExtra
     /// <summary>
     /// Creates a transform block that computes the Percent B.
     /// </summary>
+    /// <param name="name">The name to use for output keys.</param>
     /// <param name="period">The period for computation (placeholder - no effect in identity pass-through).</param>
+    /// <param name="cancellationToken">The cancellation token.</param>
     /// <returns>A transform block to use as a pipeline stage.</returns>
-    public static TransformBlock<EnrichedCandle, EnrichedCandle> PercentB(int period) =>
+    public static TransformBlock<EnrichedCandle, EnrichedCandle> PercentB(string name, int period, CancellationToken cancellationToken = default) =>
         new TransformBlock<EnrichedCandle, EnrichedCandle>(c => c);
 
     /// <summary>Returns the number of input bars consumed before <see cref="PercentB"/> produces its first value.</summary>

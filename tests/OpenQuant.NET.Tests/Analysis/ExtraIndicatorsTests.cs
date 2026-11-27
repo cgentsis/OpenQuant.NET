@@ -12,36 +12,36 @@ public class ExtraIndicatorsTests
     [Fact]
     public void MathTransforms_ReturnsBlock()
     {
-        Assert.IsType<TransformBlock<EnrichedCandle, EnrichedCandle>>(MathTransforms.Acos(10));
+        Assert.IsType<TransformBlock<EnrichedCandle, EnrichedCandle>>(MathTransforms.Acos("test"));
     }
 
     [Fact]
     public void MathOperators_ReturnsBlock()
     {
-        Assert.IsType<TransformBlock<EnrichedCandle, EnrichedCandle>>(MathOperators.Add(10));
+        Assert.IsType<TransformBlock<EnrichedCandle, EnrichedCandle>>(MathOperators.Add("test"));
     }
 
     [Fact]
     public void OverlapStudiesExtra_ReturnsBlock()
     {
-        Assert.IsType<TransformBlock<EnrichedCandle, EnrichedCandle>>(OverlapStudiesExtra.AccelerationBands(10));
+        Assert.IsType<TransformBlock<EnrichedCandle, EnrichedCandle>>(OverlapStudiesExtra.AccelerationBands("test", 10));
     }
 
     [Fact]
     public void MomentumExtra_ReturnsBlock()
     {
-        Assert.IsType<TransformBlock<EnrichedCandle, EnrichedCandle>>(MomentumExtra.AcceleratorOscillator(10));
+        Assert.IsType<TransformBlock<EnrichedCandle, EnrichedCandle>>(MomentumExtra.AcceleratorOscillator("test", 10));
     }
 
     [Fact]
     public void VolumeExtra_ReturnsBlock()
     {
-        Assert.IsType<TransformBlock<EnrichedCandle, EnrichedCandle>>(VolumeExtra.ChaikinMoneyFlow(10));
+        Assert.IsType<TransformBlock<EnrichedCandle, EnrichedCandle>>(VolumeExtra.ChaikinMoneyFlow("test", 10));
     }
 
     [Fact]
     public void VolatilityExtra_ReturnsBlock()
     {
-        Assert.IsType<TransformBlock<EnrichedCandle, EnrichedCandle>>(VolatilityExtra.AverageDayRange(10));
+        Assert.IsType<TransformBlock<EnrichedCandle, EnrichedCandle>>(VolatilityExtra.AverageDayRange("test", 10));
     }
 }
