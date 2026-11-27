@@ -1,0 +1,28 @@
+{
+  "metadata": [
+    {
+      "src": [
+        {
+          "files": [ "src/OpenQuant.NET/**/*.csproj" ],
+          "cwd": "."
+        }
+      ],
+      "dest": "api"
+    }
+  ],
+  "build": {
+    "content": [
+      {
+        "files": [ "api/**.yml" ],
+        "src": "api"
+      },
+      {
+        "files": [ "README.md" ]
+      }
+    ],
+    "globalMetadata": {
+      "_appTitle": "OpenQuant.NET API Documentation"
+    },
+    "dest": "_site"
+  }
+}
