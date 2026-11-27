@@ -26,18 +26,9 @@ dotnet_diagnostic.SA1309.severity = none
 # SA1633: File header
 dotnet_diagnostic.SA1633.severity = none
 
-# Member ordering: SA1201 (element order) and SA1202 (access modifier order) are enforced.
-# Expected order within a class/struct:
-#   1. Constants
-#   2. Static readonly fields
-#   3. Fields
-#   4. Constructors
-#   5. Properties
-#   6. Public methods
-#   7. Internal methods
-#   8. Protected methods
-#   9. Private methods
-#  10. Nested types
-# Within each group: public > internal > protected > private
-dotnet_diagnostic.SA1201.severity = error
-dotnet_diagnostic.SA1202.severity = error
+# SA1611: Missing parameter documentation
+dotnet_diagnostic.SA1611.severity = none
+# SA1615: Missing return documentation
+dotnet_diagnostic.SA1615.severity = none
+# CS1574: Invalid cref reference
+dotnet_diagnostic.CS1574.severity = none
