@@ -6,14 +6,23 @@
     <Nullable>enable</Nullable>
     <RootNamespace>OpenQuant</RootNamespace>
     <PackageId>OpenQuant.NET</PackageId>
-    <Version>0.1.0</Version>
+    <!-- Version managed by Nerdbank.GitVersioning -->
     <Authors>Christos Gentsis</Authors>
     <Description>An open-source .NET library providing unified financial data access, quantitative analysis tools, and extensible market-data integrations.</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/cgentsis/OpenQuant.NET</PackageProjectUrl>
     <RepositoryUrl>https://github.com/cgentsis/OpenQuant.NET</RepositoryUrl>
     <PackageTags>finance;quant;market-data;stocks;trading;analysis</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <IncludeSource>true</IncludeSource>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PackageReleaseNotes>Initial release with core indicators and YahooFinance provider.</PackageReleaseNotes>
+    <PackageIcon>icon.png</PackageIcon>
+    <RepositoryType>git</RepositoryType>
   </PropertyGroup>
 
   <ItemGroup>
