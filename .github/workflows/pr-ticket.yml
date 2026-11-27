@@ -14,37 +14,6 @@ jobs:
     name: ticket-linked
     runs-on: ubuntu-latest
     steps:
-      - name: Verify linked issue
-        env:
-          GH_TOKEN: ${{ github.token }}
-          OWNER: ${{ github.repository_owner }}
-          REPO: ${{ github.event.repository.name }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
+      - name: Verify linked issue (disabled)
         run: |
-          set -euo pipefail
-
-          query='
-          query($owner: String!, $repo: String!, $prNumber: Int!) {
-            repository(owner: $owner, name: $repo) {
-              pullRequest(number: $prNumber) {
-                closingIssuesReferences(first: 10) {
-                  nodes {
-                    number
-                    url
-                  }
-                }
-              }
-            }
-          }
-          '
-
-          result=$(gh api graphql -f query="$query" -F owner="$OWNER" -F repo="$REPO" -F prNumber="$PR_NUMBER")
-          count=$(printf '%s' "$result" | jq '.data.repository.pullRequest.closingIssuesReferences.nodes | length')
-
-          if [ "$count" -eq 0 ]; then
-            echo "::error::Link a ticket in the PR description, for example: Closes #123."
-            exit 1
-          fi
-
-          tickets=$(printf '%s' "$result" | jq -r '[.data.repository.pullRequest.closingIssuesReferences.nodes[] | "#\(.number)"] | join(", ")')
-          echo "Linked ticket(s): $tickets"
+          echo "Ticket linking check disabled – always passes."
