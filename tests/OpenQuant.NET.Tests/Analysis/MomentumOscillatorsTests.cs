@@ -266,8 +266,79 @@ public class MomentumOscillatorsTests
         Assert.False(results[0].Indicators.ContainsKey("Aroon_Up"));
         Assert.False(results[1].Indicators.ContainsKey("Aroon_Up"));
         Assert.False(results[2].Indicators.ContainsKey("Aroon_Up"));
+
+        // Queue highs = [10, 20, 15, 25], period=3
+        // highMax=25 at idx=3 (newest) → Up = 3/3*100 = 100
         Assert.Equal(100m, results[3].Indicators["Aroon_Up"]);
+
+        // Queue lows = [5, 10, 8, 12], lowMin=5 at idx=0 (oldest) → Down = 0/3*100 = 0
         Assert.Equal(0m, results[3].Indicators["Aroon_Down"]);
+    }
+
+    [Fact]
+    public async Task Aroon_WhenMostRecentBarIsHighest_ReturnsOneHundred()
+    {
+        var results = new List<EnrichedCandle>();
+        var aroon = MomentumOscillators.Aroon("Aroon", 3);
+        var sink = CreateSink(results);
+        aroon.LinkTo(sink, new DataflowLinkOptions { PropagateCompletion = true });
+
+        var candles = new[]
+        {
+            MakeCandle(10m, 10m, 5m, 10m, dayOffset: 0),
+            MakeCandle(10m, 10m, 6m, 10m, dayOffset: 1),
+            MakeCandle(10m, 12m, 7m, 10m, dayOffset: 2),
+            MakeCandle(10m, 15m, 8m, 10m, dayOffset: 3),
+        };
+
+        foreach (var candle in candles)
+        {
+            await aroon.SendAsync(candle);
+        }
+
+        aroon.Complete();
+        await sink.Completion;
+
+        // Queue highs = [10, 10, 12, 15], highMax=15 at idx=3 (newest)
+        // Up = 3/3*100 = 100 (most recent bar is the highest)
+        Assert.Equal(100m, results[3].Indicators["Aroon_Up"]);
+
+        // Queue lows = [5, 6, 7, 8], lowMin=5 at idx=0 (oldest)
+        // Down = 0/3*100 = 0
+        Assert.Equal(0m, results[3].Indicators["Aroon_Down"]);
+    }
+
+    [Fact]
+    public async Task Aroon_WhenMostRecentBarIsLowest_ReturnsOneHundredDown()
+    {
+        var results = new List<EnrichedCandle>();
+        var aroon = MomentumOscillators.Aroon("Aroon", 3);
+        var sink = CreateSink(results);
+        aroon.LinkTo(sink, new DataflowLinkOptions { PropagateCompletion = true });
+
+        var candles = new[]
+        {
+            MakeCandle(10m, 15m, 15m, 10m, dayOffset: 0),
+            MakeCandle(10m, 14m, 14m, 10m, dayOffset: 1),
+            MakeCandle(10m, 13m, 12m, 10m, dayOffset: 2),
+            MakeCandle(10m, 12m, 10m, 10m, dayOffset: 3),
+        };
+
+        foreach (var candle in candles)
+        {
+            await aroon.SendAsync(candle);
+        }
+
+        aroon.Complete();
+        await sink.Completion;
+
+        // Queue highs = [15, 14, 13, 12], highMax=15 at idx=0 (oldest)
+        // Up = 0/3*100 = 0
+        Assert.Equal(0m, results[3].Indicators["Aroon_Up"]);
+
+        // Queue lows = [15, 14, 12, 10], lowMin=10 at idx=3 (newest)
+        // Down = 3/3*100 = 100 (most recent bar is the lowest)
+        Assert.Equal(100m, results[3].Indicators["Aroon_Down"]);
     }
 
     [Fact]
@@ -294,7 +365,38 @@ public class MomentumOscillatorsTests
         aroonOsc.Complete();
         await sink.Completion;
 
+        // Same queue as Aroon test: highIdx=3, lowIdx=0
+        // Up = 100, Down = 0, Osc = 100 - 0 = 100
         Assert.Equal(100m, results[3].Indicators["AroonOsc"]);
+    }
+
+    [Fact]
+    public async Task AroonOsc_WhenLowIsMostRecent_ReturnsNegative()
+    {
+        var results = new List<EnrichedCandle>();
+        var aroonOsc = MomentumOscillators.AroonOsc("AroonOsc", 3);
+        var sink = CreateSink(results);
+        aroonOsc.LinkTo(sink, new DataflowLinkOptions { PropagateCompletion = true });
+
+        var candles = new[]
+        {
+            MakeCandle(10m, 15m, 15m, 10m, dayOffset: 0),
+            MakeCandle(10m, 14m, 14m, 10m, dayOffset: 1),
+            MakeCandle(10m, 13m, 12m, 10m, dayOffset: 2),
+            MakeCandle(10m, 12m, 10m, 10m, dayOffset: 3),
+        };
+
+        foreach (var candle in candles)
+        {
+            await aroonOsc.SendAsync(candle);
+        }
+
+        aroonOsc.Complete();
+        await sink.Completion;
+
+        // highIdx=0 (oldest is highest), lowIdx=3 (newest is lowest)
+        // Up = 0, Down = 100, Osc = 0 - 100 = -100
+        Assert.Equal(-100m, results[3].Indicators["AroonOsc"]);
     }
 
     [Fact]

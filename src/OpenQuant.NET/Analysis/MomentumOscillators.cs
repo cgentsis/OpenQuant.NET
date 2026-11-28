@@ -547,7 +547,7 @@ public static class MomentumOscillators
 
                     foreach (var h in highs)
                     {
-                        if (h >= highMax)
+                        if (h > highMax)
                         {
                             highMax = h;
                             highIdx = idx;
@@ -559,7 +559,7 @@ public static class MomentumOscillators
                     idx = 0;
                     foreach (var l in lows)
                     {
-                        if (l <= lowMin)
+                        if (l < lowMin)
                         {
                             lowMin = l;
                             lowIdx = idx;
@@ -568,8 +568,8 @@ public static class MomentumOscillators
                         idx++;
                     }
 
-                    enriched.Indicators[name + "_Up"] = ((decimal)highIdx / period) * 100m;
-                    enriched.Indicators[name + "_Down"] = ((decimal)lowIdx / period) * 100m;
+                    enriched.Indicators[name + "_Up"] = ((decimal)(period - highIdx) / period) * 100m;
+                    enriched.Indicators[name + "_Down"] = ((decimal)(period - lowIdx) / period) * 100m;
                 }
 
                 return enriched;
@@ -621,7 +621,7 @@ public static class MomentumOscillators
 
                     foreach (var h in highs)
                     {
-                        if (h >= highMax)
+                        if (h > highMax)
                         {
                             highMax = h;
                             highIdx = idx;
@@ -633,7 +633,7 @@ public static class MomentumOscillators
                     idx = 0;
                     foreach (var l in lows)
                     {
-                        if (l <= lowMin)
+                        if (l < lowMin)
                         {
                             lowMin = l;
                             lowIdx = idx;
@@ -642,8 +642,8 @@ public static class MomentumOscillators
                         idx++;
                     }
 
-                    var aroonUp = ((decimal)highIdx / period) * 100m;
-                    var aroonDown = ((decimal)lowIdx / period) * 100m;
+                    var aroonUp = ((decimal)(period - highIdx) / period) * 100m;
+                    var aroonDown = ((decimal)(period - lowIdx) / period) * 100m;
                     enriched.Indicators[name] = aroonUp - aroonDown;
                 }
 
