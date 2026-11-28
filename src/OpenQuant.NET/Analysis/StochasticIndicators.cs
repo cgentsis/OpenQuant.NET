@@ -33,8 +33,7 @@ public static class StochasticIndicators
 
         var highs = new Queue<decimal>(fastKPeriod);
         var lows = new Queue<decimal>(fastKPeriod);
-        var kWindow = new Queue<decimal>(slowKPeriod);
-        var kSum = 0m;
+
         var dWindow = new Queue<decimal>(slowDPeriod);
         var dSum = 0m;
 
@@ -56,33 +55,23 @@ public static class StochasticIndicators
                     var hh = highs.Max();
                     var ll = lows.Min();
                     var range = hh - ll;
-                    var fastK = range == 0m ? 50m : ((c.Close - ll) / range) * 100m;
+                    var fastK = range == 0m ? 0m : ((c.Close - ll) / range) * 100m;
 
-                    kSum += fastK;
-                    kWindow.Enqueue(fastK);
+                    // Output raw fast %K as K
+                    enriched.Indicators[name + "_K"] = fastK;
 
-                    if (kWindow.Count > slowKPeriod)
+                    // Compute D as SMA of fastK over slowDPeriod
+                    dSum += fastK;
+                    dWindow.Enqueue(fastK);
+
+                    if (dWindow.Count > slowDPeriod)
                     {
-                        kSum -= kWindow.Dequeue();
+                        dSum -= dWindow.Dequeue();
                     }
 
-                    if (kWindow.Count == slowKPeriod)
+                    if (dWindow.Count == slowDPeriod)
                     {
-                        var slowK = kSum / slowKPeriod;
-                        enriched.Indicators[name + "_K"] = slowK;
-
-                        dSum += slowK;
-                        dWindow.Enqueue(slowK);
-
-                        if (dWindow.Count > slowDPeriod)
-                        {
-                            dSum -= dWindow.Dequeue();
-                        }
-
-                        if (dWindow.Count == slowDPeriod)
-                        {
-                            enriched.Indicators[name + "_D"] = dSum / slowDPeriod;
-                        }
+                        enriched.Indicators[name + "_D"] = dSum / slowDPeriod;
                     }
                 }
 

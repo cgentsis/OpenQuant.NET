@@ -181,6 +181,16 @@ public static class VolatilityIndicators
                     enriched.Indicators[name + "_Upper"] = sma + stdDev;
                     enriched.Indicators[name + "_Middle"] = sma;
                     enriched.Indicators[name + "_Lower"] = sma - stdDev;
+
+                    // Guard against zero-width bands (all prices identical)
+                    if (stdDev == 0m)
+                    {
+                        enriched.Indicators[name + "_PercentB"] = 0.5m;
+                    }
+                    else
+                    {
+                        enriched.Indicators[name + "_PercentB"] = (close - (sma - stdDev)) / (stdDev * 2m);
+                    }
                 }
 
                 return enriched;

@@ -9,7 +9,7 @@ OpenQuant.NET is an open‑source .NET library providing unified financial data 
 - **Unified data model** – `Candle` record for OHLCV (Open, High, Low, Close, Volume) price data
 - **Provider abstraction** – `IMarketDataProvider` interface to plug in any market‑data source
 - **Yahoo Finance provider** – Built‑in provider for retrieving historical and latest candle data
-- **Technical analysis** – 150+ indicators as chainable TPL Dataflow `TransformBlock` pipeline stages
+- **Technical analysis** – 150+ indicators (now including Math Transforms, Math Operators, extra Overlap Studies, Momentum, Volume, and Volatility indicators) as chainable TPL Dataflow `TransformBlock` pipeline stages
   - Moving Averages: SMA, EMA, WMA, HMA, DEMA, TEMA, T3, TRIMA, KAMA, Median
   - Price Transforms: AVGPRICE, MEDPRICE, TYPPRICE, WCLPRICE, BOP, True Range
   - Rolling Window: SUM, MAX, MIN, MAXINDEX, MININDEX, MINMAX, MINMAXINDEX, MIDPOINT, MIDPRICE, MOM, ROC, ROCP, ROCR, ROCR100
@@ -157,6 +157,81 @@ var engulfing = CandlestickPatterns.Engulfing("ENGULF");
 var hammer    = CandlestickPatterns.Hammer("HAMMER");
 ```
 
+### Additional Indicator Facades
+
+The extra indicator facades use the same period-first convention as the core library. `period` is always the first argument, followed by any indicator-specific options, an optional output name, and an optional cancellation token.
+
+```csharp
+// Math Transforms
+var logClose = MathTransforms.Ln(10);
+var log10 = MathTransforms.Log10(10);
+var exp = MathTransforms.Exp(1);
+var sin = MathTransforms.Sin(0.5);
+var cos = MathTransforms.Cos(0.5);
+
+// Math Operators
+var add = MathOperators.Add(10, 5);
+var sub = MathOperators.Sub(10, 5);
+var mul = MathOperators.Mul(10, 5);
+var div = MathOperators.Div(10, 5);
+var cumSum = MathOperators.CumSum(new[] { 1m, 2m, 3m });
+
+// Overlap Studies Extra
+var donchian = OverlapStudiesExtra.DonchianChannels(20);
+var keltner = OverlapStudiesExtra.KeltnerChannels(20);
+var ichimoku = OverlapStudiesExtra.IchimokuKinkoHyo(9, 26, 52);
+var vwma = OverlapStudiesExtra.Vwma(20);
+
+// Momentum Extra
+var awesome = MomentumExtra.AwesomeOscillator(5, 34);
+var accelerator = MomentumExtra.AcceleratorOscillator(5, 34, 5);
+var cog = MomentumExtra.CenterOfGravity(14);
+var choppiness = MomentumExtra.ChoppinessIndex(14);
+var choppinessTR = MomentumExtra.ChoppinessIndexTrueRangeBox(14);
+var coppock = MomentumExtra.CoppockCurve(10);
+var connorsRsi = MomentumExtra.ConnorsRSI(14);
+var correlation = MomentumExtra.CorrelationTrendIndicator(14);
+var derivative = MomentumExtra.DerivativeOscillator(5);
+var dpo = MomentumExtra.DetrendedPriceOscillator(14);
+
+// Volatility Extra
+var bbWidth = VolatilityExtra.BollingerBandWidth(20);
+var adr = VolatilityExtra.ADR(14);
+var massIndex = VolatilityExtra.MassIndex(9);
+var chaikinVol = VolatilityExtra.ChaikinVolatility(14);
+var percentB = VolatilityExtra.PercentB(20);
+
+// Volume Extra
+var chaikinMF = VolumeExtra.ChaikinMoneyFlow(20);
+var forceIdx = VolumeExtra.ElderForceIndex(14);
+var klinger = VolumeExtra.Klinger(34);
+var pvi = VolumeExtra.Pvi(14);
+var pvo = VolumeExtra.Pvo(14);
+```
+
+When `name` is omitted, single-value indicators write to `EnrichedCandle.Indicators[MethodName]`. Indicators with multiple outputs use suffixed keys such as `DonchianChannels_Upper`, `DonchianChannels_Middle`, and `DonchianChannels_Lower`. Each factory has a matching zero-argument-callable lookback helper, for example `MathTransforms.LnLookback()` and `VolumeExtra.ChaikinMoneyFlowLookback()`.
+
+### Look‑back methods
+
+Every indicator factory also provides a zero‑argument look‑back helper that returns the number of input bars required before the first value is produced. The helpers follow the naming convention `<FactoryName>Lookback`. For the newly added facades:
+
+```csharp
+int aoLookback = MomentumExtra.AwesomeOscillatorLookback(5, 34);
+int accLookback = MomentumExtra.AcceleratorOscillatorLookback(5, 34, 5);
+int cogLookback = MomentumExtra.CenterOfGravityLookback(14);
+int choppinessLookback = MomentumExtra.ChoppinessIndexLookback(14);
+int choppinessTRLookback = MomentumExtra.ChoppinessIndexTrueRangeBoxLookback(14);
+int coppockLookback = MomentumExtra.CoppockCurveLookback(10);
+int connorsLookback = MomentumExtra.ConnorsRSILookback(14, 3);
+int correlationLookback = MomentumExtra.CorrelationTrendIndicatorLookback(14);
+int derivativeLookback = MomentumExtra.DerivativeOscillatorLookback(5);
+int dpoLookback = MomentumExtra.DetrendedPriceOscillatorLookback(14);
+// ...and similarly for the other extra facades
+```
+
+These methods are used by the library’s warm‑up logic and are documented in the source code.
+
+
 ### Implementing a Custom Data Provider
 
 Implement `IMarketDataProvider` to integrate any data source:
@@ -205,6 +280,12 @@ OpenQuant.NET/
 │       │   ├── VolumeIndicators.cs           # OBV, AD, ADOSC, MFI
 │       │   ├── StochasticIndicators.cs       # STOCH, STOCHF, StochRSI
 │       │   ├── AdvancedIndicators.cs         # SAR, Hilbert Transform family
+│       │   ├── MathTransforms.cs             # Trigonometric, exponential, and rounding transforms
+│       │   ├── MathOperators.cs              # ADD, SUB, MULT, DIV, CUMSUM
+│       │   ├── OverlapStudiesExtra.cs        # AB, ALMA, CKSTOP, Donchian, FRAMA, Ichimoku, Keltner, VWMA, ZigZag
+│       │   ├── MomentumExtra.cs              # AO, AC, COG, CHI, Coppock, Connors RSI, and more
+│       │   ├── VolatilityExtra.cs            # ADR, Bollinger width, Chaikin volatility, Mass Index, Percent B
+│       │   ├── VolumeExtra.cs                # CMF, Force Index, EOM, Klinger, MFI, PVI, PVO
 │       │   └── CandlestickPatterns.cs        # 30+ candlestick pattern recognizers
 │       ├── Providers/
 │       │   └── YahooFinance/

@@ -547,7 +547,7 @@ public static class MomentumOscillators
 
                     foreach (var h in highs)
                     {
-                        if (h >= highMax)
+                        if (h > highMax)
                         {
                             highMax = h;
                             highIdx = idx;
@@ -559,7 +559,7 @@ public static class MomentumOscillators
                     idx = 0;
                     foreach (var l in lows)
                     {
-                        if (l <= lowMin)
+                        if (l < lowMin)
                         {
                             lowMin = l;
                             lowIdx = idx;
@@ -621,7 +621,7 @@ public static class MomentumOscillators
 
                     foreach (var h in highs)
                     {
-                        if (h >= highMax)
+                        if (h > highMax)
                         {
                             highMax = h;
                             highIdx = idx;
@@ -633,7 +633,7 @@ public static class MomentumOscillators
                     idx = 0;
                     foreach (var l in lows)
                     {
-                        if (l <= lowMin)
+                        if (l < lowMin)
                         {
                             lowMin = l;
                             lowIdx = idx;
