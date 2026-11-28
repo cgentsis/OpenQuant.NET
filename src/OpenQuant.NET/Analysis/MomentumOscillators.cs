@@ -568,8 +568,8 @@ public static class MomentumOscillators
                         idx++;
                     }
 
-                    enriched.Indicators[name + "_Up"] = ((decimal)(period - highIdx) / period) * 100m;
-                    enriched.Indicators[name + "_Down"] = ((decimal)(period - lowIdx) / period) * 100m;
+                    enriched.Indicators[name + "_Up"] = ((decimal)highIdx / period) * 100m;
+                    enriched.Indicators[name + "_Down"] = ((decimal)lowIdx / period) * 100m;
                 }
 
                 return enriched;
@@ -642,8 +642,8 @@ public static class MomentumOscillators
                         idx++;
                     }
 
-                    var aroonUp = ((decimal)(period - highIdx) / period) * 100m;
-                    var aroonDown = ((decimal)(period - lowIdx) / period) * 100m;
+                    var aroonUp = ((decimal)highIdx / period) * 100m;
+                    var aroonDown = ((decimal)lowIdx / period) * 100m;
                     enriched.Indicators[name] = aroonUp - aroonDown;
                 }
 
