@@ -157,6 +157,21 @@ var engulfing = CandlestickPatterns.Engulfing("ENGULF");
 var hammer    = CandlestickPatterns.Hammer("HAMMER");
 ```
 
+### Additional Indicator Facades
+
+The extra indicator facades use the same period-first convention as the core library. `period` is always the first argument, followed by any indicator-specific options, an optional output name, and an optional cancellation token.
+
+```csharp
+var logClose = MathTransforms.Ln(10);
+var highPlusLow = MathOperators.Add(10);
+var channels = OverlapStudiesExtra.DonchianChannels(20);
+var coppock = MomentumExtra.CoppockCurve(10);
+var bandwidth = VolatilityExtra.BollingerBandWidth(20);
+var moneyFlow = VolumeExtra.ChaikinMoneyFlow(20);
+```
+
+When `name` is omitted, single-value indicators write to `EnrichedCandle.Indicators[MethodName]`. Indicators with multiple outputs use suffixed keys such as `DonchianChannels_Upper`, `DonchianChannels_Middle`, and `DonchianChannels_Lower`. Each factory has a matching zero-argument-callable lookback helper, for example `MathTransforms.LnLookback()` and `VolumeExtra.ChaikinMoneyFlowLookback()`.
+
 ### Implementing a Custom Data Provider
 
 Implement `IMarketDataProvider` to integrate any data source:
@@ -205,6 +220,12 @@ OpenQuant.NET/
 │       │   ├── VolumeIndicators.cs           # OBV, AD, ADOSC, MFI
 │       │   ├── StochasticIndicators.cs       # STOCH, STOCHF, StochRSI
 │       │   ├── AdvancedIndicators.cs         # SAR, Hilbert Transform family
+│       │   ├── MathTransforms.cs             # Trigonometric, exponential, and rounding transforms
+│       │   ├── MathOperators.cs              # ADD, SUB, MULT, DIV, CUMSUM
+│       │   ├── OverlapStudiesExtra.cs        # AB, ALMA, CKSTOP, Donchian, FRAMA, Ichimoku, Keltner, VWMA, ZigZag
+│       │   ├── MomentumExtra.cs              # AO, AC, COG, CHI, Coppock, Connors RSI, and more
+│       │   ├── VolatilityExtra.cs            # ADR, Bollinger width, Chaikin volatility, Mass Index, Percent B
+│       │   ├── VolumeExtra.cs                # CMF, Force Index, EOM, Klinger, MFI, PVI, PVO
 │       │   └── CandlestickPatterns.cs        # 30+ candlestick pattern recognizers
 │       ├── Providers/
 │       │   └── YahooFinance/
