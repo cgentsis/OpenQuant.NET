@@ -10,6 +10,7 @@ using Xunit;
 
 namespace OpenQuant.Tests.Analysis;
 
+[Trait("Category", "Integration")]
 public class CrossCheckTests
 {
     private const int DataCount = 10000;
