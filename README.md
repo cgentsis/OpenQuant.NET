@@ -162,15 +162,75 @@ var hammer    = CandlestickPatterns.Hammer("HAMMER");
 The extra indicator facades use the same period-first convention as the core library. `period` is always the first argument, followed by any indicator-specific options, an optional output name, and an optional cancellation token.
 
 ```csharp
+// Math Transforms
 var logClose = MathTransforms.Ln(10);
-var highPlusLow = MathOperators.Add(10);
-var channels = OverlapStudiesExtra.DonchianChannels(20);
+var log10 = MathTransforms.Log10(10);
+var exp = MathTransforms.Exp(1);
+var sin = MathTransforms.Sin(0.5);
+var cos = MathTransforms.Cos(0.5);
+
+// Math Operators
+var add = MathOperators.Add(10, 5);
+var sub = MathOperators.Sub(10, 5);
+var mul = MathOperators.Mul(10, 5);
+var div = MathOperators.Div(10, 5);
+var cumSum = MathOperators.CumSum(new[] { 1m, 2m, 3m });
+
+// Overlap Studies Extra
+var donchian = OverlapStudiesExtra.DonchianChannels(20);
+var keltner = OverlapStudiesExtra.KeltnerChannels(20);
+var ichimoku = OverlapStudiesExtra.IchimokuKinkoHyo(9, 26, 52);
+var vwma = OverlapStudiesExtra.Vwma(20);
+
+// Momentum Extra
+var awesome = MomentumExtra.AwesomeOscillator(5, 34);
+var accelerator = MomentumExtra.AcceleratorOscillator(5, 34, 5);
+var cog = MomentumExtra.CenterOfGravity(14);
+var choppiness = MomentumExtra.ChoppinessIndex(14);
+var choppinessTR = MomentumExtra.ChoppinessIndexTrueRangeBox(14);
 var coppock = MomentumExtra.CoppockCurve(10);
-var bandwidth = VolatilityExtra.BollingerBandWidth(20);
-var moneyFlow = VolumeExtra.ChaikinMoneyFlow(20);
+var connorsRsi = MomentumExtra.ConnorsRSI(14);
+var correlation = MomentumExtra.CorrelationTrendIndicator(14);
+var derivative = MomentumExtra.DerivativeOscillator(5);
+var dpo = MomentumExtra.DetrendedPriceOscillator(14);
+
+// Volatility Extra
+var bbWidth = VolatilityExtra.BollingerBandWidth(20);
+var adr = VolatilityExtra.ADR(14);
+var massIndex = VolatilityExtra.MassIndex(9);
+var chaikinVol = VolatilityExtra.ChaikinVolatility(14);
+var percentB = VolatilityExtra.PercentB(20);
+
+// Volume Extra
+var chaikinMF = VolumeExtra.ChaikinMoneyFlow(20);
+var forceIdx = VolumeExtra.ElderForceIndex(14);
+var klinger = VolumeExtra.Klinger(34);
+var pvi = VolumeExtra.Pvi(14);
+var pvo = VolumeExtra.Pvo(14);
 ```
 
 When `name` is omitted, single-value indicators write to `EnrichedCandle.Indicators[MethodName]`. Indicators with multiple outputs use suffixed keys such as `DonchianChannels_Upper`, `DonchianChannels_Middle`, and `DonchianChannels_Lower`. Each factory has a matching zero-argument-callable lookback helper, for example `MathTransforms.LnLookback()` and `VolumeExtra.ChaikinMoneyFlowLookback()`.
+
+### Look‑back methods
+
+Every indicator factory also provides a zero‑argument look‑back helper that returns the number of input bars required before the first value is produced. The helpers follow the naming convention `<FactoryName>Lookback`. For the newly added facades:
+
+```csharp
+int aoLookback = MomentumExtra.AwesomeOscillatorLookback(5, 34);
+int accLookback = MomentumExtra.AcceleratorOscillatorLookback(5, 34, 5);
+int cogLookback = MomentumExtra.CenterOfGravityLookback(14);
+int choppinessLookback = MomentumExtra.ChoppinessIndexLookback(14);
+int choppinessTRLookback = MomentumExtra.ChoppinessIndexTrueRangeBoxLookback(14);
+int coppockLookback = MomentumExtra.CoppockCurveLookback(10);
+int connorsLookback = MomentumExtra.ConnorsRSILookback(14, 3);
+int correlationLookback = MomentumExtra.CorrelationTrendIndicatorLookback(14);
+int derivativeLookback = MomentumExtra.DerivativeOscillatorLookback(5);
+int dpoLookback = MomentumExtra.DetrendedPriceOscillatorLookback(14);
+// ...and similarly for the other extra facades
+```
+
+These methods are used by the library’s warm‑up logic and are documented in the source code.
+
 
 ### Implementing a Custom Data Provider
 
